@@ -5,6 +5,11 @@
   --foreground: #171717;
 }
 
+.dark{
+  --background: #01142a;
+  --foreground: #ffffff;
+}
+
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
@@ -12,15 +17,184 @@
   --font-mono: var(--font-geist-mono);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
-
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: 'inter-regular';
+  overflow-x: hidden;
+}
+
+@font-face {
+  font-family: "poppins-thin";
+  src: url("../../public/fonts/Poppins/Poppins-Thin.ttf");
+}
+
+@font-face {
+  font-family: "poppins-light";
+  src: url("../../public/fonts/Poppins/Poppins-Light.ttf");
+}
+
+@font-face {
+  font-family: "poppins-regular";
+  src: url("../../public/fonts/Poppins/Poppins-Regular.ttf");
+}
+
+@font-face {
+  font-family: "poppins-medium";
+  src: url("../../public/fonts/Poppins/Poppins-Medium.ttf");
+}
+
+@font-face {
+  font-family: "poppins-semibold";
+  src: url("../../public/fonts/Poppins/Poppins-SemiBold.ttf");
+}
+
+@font-face {
+  font-family: "poppins-bold";
+  src: url("../../public/fonts/Poppins/Poppins-Bold.ttf");
+}
+
+@font-face {
+  font-family: "poppins-extrabold";
+  src: url("../../public/fonts/Poppins/Poppins-ExtraBold.ttf");
+}
+
+@font-face {
+  font-family: "poppins-black";
+  src: url("../../public/fonts/Poppins/Poppins-Black.ttf");
+}
+
+@font-face {
+  font-family: 'inter-thin';
+  src: url('../../public/fonts/Inter/Inter_18pt-Thin.ttf');
+}
+
+@font-face {
+  font-family: 'inter-light';
+  src: url('../../public/fonts/Inter/Inter_18pt-Light.ttf');
+}
+
+@font-face {
+  font-family: 'inter-regular';
+  src: url('../../public/fonts/Inter/Inter_18pt-Regular.ttf');
+}
+
+@font-face {
+  font-family: 'inter-medium';
+  src: url('../../public/fonts/Inter/Inter_18pt-Medium.ttf');
+}
+
+@font-face {
+  font-family: 'inter-semibold';
+  src: url('../../public/fonts/Inter/Inter_18pt-SemiBold.ttf');
+}
+
+@font-face {
+  font-family: 'inter-bold';
+  src: url('../../public/fonts/Inter/Inter_18pt-Bold.ttf');
+}
+
+@font-face {
+  font-family: 'inter-extrabold';
+  src: url('../../public/fonts/Inter/Inter_18pt-ExtraBold.ttf');
+}
+
+@font-face {
+  font-family: 'inter-black';
+  src: url('../../public/fonts/Inter/Inter_18pt-Black.ttf');
+}
+
+.poppins-thin {
+  font-family: 'poppins-thin';
+}
+
+.poppins-light {
+  font-family: 'poppins-light';
+}
+
+.poppins-regular {
+  font-family: 'poppins-regular';
+}
+
+.poppins-medium {
+  font-family: 'poppins-medium';
+}
+
+.poppins-semibold {
+  font-family: 'poppins-semibold';
+}
+
+.poppins-bold {
+  font-family: 'poppins-bold';
+}
+
+.poppins-extrabold {
+  font-family: 'poppins-extrabold';
+}
+
+.poppins-black {
+  font-family: 'poppins-black';
+}
+
+.inter-thin {
+  font-family: 'inter-thin';
+}
+
+.inter-light {
+  font-family: 'inter-light';
+}
+
+.inter-regular {
+  font-family: 'inter-regular';
+}
+
+.inter-medium {
+  font-family: 'inter-medium';
+}
+
+.inter-semibold {
+  font-family: 'inter-semibold';
+}
+
+.inter-bold {
+  font-family: 'inter-bold';
+}
+
+.inter-extrabold {
+  font-family: 'inter-extrabold';
+}
+
+.inter-black {
+  font-family: 'inter-black';
+}
+
+
+
+.theme-toggle svg {
+  transition: transform 0.5s ease-in-out;
+}
+
+@layer base {
+  html {
+    transition: background-color 0.3s ease, color 0.3s ease;
+  }
+
+  body {
+    transition: background-color 0.3s ease, color 0.3s ease;
+  }
+}
+
+/* Hide scrollbar for Chrome, Safari and Opera */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+/* Hide scrollbar for IE, Edge and Firefox */
+.no-scrollbar {
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;  /* Firefox */
+}
+
+button {
+  cursor: pointer;
 }
