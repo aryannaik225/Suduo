@@ -2,7 +2,6 @@
 
 import React, { useState, useEffect } from 'react';
 import { ToastContainer } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
 import { FaSpinner } from 'react-icons/fa';
 import { useRouter } from 'next/navigation';
 import { v4 as uuidv4 } from 'uuid';
