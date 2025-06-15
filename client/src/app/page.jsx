@@ -34,44 +34,6 @@ export default function Home() {
   }, [theme])
 
 
-  const handleStartGame = async () => {
-    if (!name || !difficulty ) {
-      toast.error('Please enter your username and select difficulty!', {
-        position: 'top-center',
-        autoClose: 3000,
-        theme: theme === 'dark' ? 'dark' : 'light',
-      })
-      return;
-    }
-
-    setLoading(true)
-
-    try {
-      const res = await axios.get(`/api/generate-sudoku?difficulty=${difficulty}`)
-      const { puzzle, solution, difficultyRating } = res.data;
-
-      const sessionId = uuidv4()
-      const availablePfps = Array.from({ length: 16 }, (_, i) => `/profile_avatars/pfp${i + 1}.svg`)
-      const pfp = availablePfps[Math.floor(Math.random() * availablePfps.length)]
-
-      localStorage.setItem('sudokuGameData', JSON.stringify({
-        sessionId, name, pfp, difficulty, puzzle, solution, difficultyRating
-      }))
-
-      setLoading(false)
-      setReady(true)
-
-      setTimeout(() => {
-        router.push(`/game/${sessionId}`)
-      }, 1000)
-    } catch (err) {
-      console.error(err)
-      toast.error('Failed to generate puzzle')
-      setLoading(false)
-    }
-  }
-
-
   return (
     <div className='w-screen h-screen flex justify-center items-center'>
       <div className='flex flex-col items-center min-h-10 w-80'>
@@ -107,7 +69,7 @@ export default function Home() {
 
         <button
           className='mt-5 w-full py-3 bg-gray-800 text-white rounded-lg text-[15px] inter-regular hover:bg-gray-700 duration-200 transition flex justify-center items-center'
-          onClick={handleStartGame}
+          onClick={() => {alert('Yayy')}}
           disabled={loading}
         >
           {loading
