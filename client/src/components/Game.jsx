@@ -10,6 +10,7 @@ import { LuPencilLine } from 'react-icons/lu'
 import copy from 'copy-to-clipboard'
 import { motion, AnimatePresence } from 'motion/react'
 import { QRCodeCanvas } from 'qrcode.react'
+import ChatBox from './ChatBox'
 
 const Game = () => {
 
@@ -294,6 +295,8 @@ const Game = () => {
           </div>
 
           <div className='w-full h-full flex flex-col items-center justify-between gap-3'>
+
+            <ChatBox roomId={sessionId}/>
 
             <div className='grid grid-cols-5 w-full gap-2'>
               {[...Array(9)].map((_, i) => (
