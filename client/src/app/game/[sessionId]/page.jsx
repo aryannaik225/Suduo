@@ -3,6 +3,7 @@
 import React, { useState, useEffect, use } from 'react';
 import { useRouter } from 'next/navigation';
 import NavBar from '@/components/NavBar';
+import Game from '@/components/Game';
 
 export default function Home() {
 
@@ -33,7 +34,7 @@ export default function Home() {
   return (
     <div>
       <NavBar theme={theme} setTheme={setTheme} />
-      
+      <Game />
     </div>
   )
 }
