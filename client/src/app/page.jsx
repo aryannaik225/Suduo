@@ -6,6 +6,7 @@ import { FaSpinner } from 'react-icons/fa';
 import { useRouter } from 'next/navigation';
 import { v4 as uuidv4 } from 'uuid';
 import axios from 'axios';
+import { nanoid } from 'nanoid';
 
 const difficulties = ['Easy', 'Medium', 'Hard', 'Insane', 'Inhuman']
 
@@ -32,6 +33,50 @@ export default function Home() {
     }
     localStorage.setItem('theme', theme)
   }, [theme])
+
+
+  const handleStartGame = async () => {
+    if (!name || !difficulty) {
+      toast.error('Please enter your username and select a difficulty level.', {
+        position: 'top-center',
+        autoClose: 3000,
+        pauseOnHover: true,
+        theme: theme === 'dark' ? 'dark' : 'light'
+      })
+      return;
+    }
+
+    setLoading(true)
+
+    try {
+
+      const sessionId = nanoid()
+
+      localStorage.setItem('hostData', JSON.stringify({
+        sessionId,
+        difficulty,
+        hostUsername: name,
+        hostPfp: `/profile_avatars/pfp${Math.floor(Math.random() * 16) + 1}.svg`,
+      }));
+
+      setLoading(false);
+      setReady(true);
+
+      setTimeout(() => {
+        router.push(`/game/${sessionId}`)
+      }, 2000)
+
+    } catch (error) {
+      console.error('Error starting game:', error);
+      toast.error('Failed to start the game. Please try again.', {
+        position: 'top-center',
+        autoClose: 3000,
+        pauseOnHover: true,
+        theme: theme === 'dark' ? 'dark' : 'light'
+      });
+      setLoading(false);
+    }
+  }
 
 
   return (
@@ -69,7 +114,7 @@ export default function Home() {
 
         <button
           className='mt-5 w-full py-3 bg-gray-800 text-white rounded-lg text-[15px] inter-regular hover:bg-gray-700 duration-200 transition flex justify-center items-center'
-          onClick={() => {alert('Yayy')}}
+          onClick={handleStartGame}
           disabled={loading}
         >
           {loading

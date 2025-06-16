@@ -11,6 +11,8 @@ import copy from 'copy-to-clipboard'
 import { motion, AnimatePresence } from 'motion/react'
 import { QRCodeCanvas } from 'qrcode.react'
 import ChatBox from './ChatBox'
+import { createSession, subscribeToSession, updateSession } from '@/firebase/firestoreUtils'
+import { useParams } from 'next/navigation'
 
 const Game = () => {
 
@@ -171,7 +173,11 @@ const Game = () => {
     return () => document.removeEventListener('keydown', handleKeyDown);
   }, [selectedCell, userGrid, initialGrid]);
 
-  // ---------------- Socket Logic ---------------
+  // ---------------- Firebase Logic ---------------
+
+
+
+
 
   return (
     <div className='flex justify-center mb-10'>
@@ -296,7 +302,7 @@ const Game = () => {
 
           <div className='w-full h-full flex flex-col items-center justify-between gap-3'>
 
-            <ChatBox roomId={sessionId}/>
+            <ChatBox roomId={sessionId} />
 
             <div className='grid grid-cols-5 w-full gap-2'>
               {[...Array(9)].map((_, i) => (
