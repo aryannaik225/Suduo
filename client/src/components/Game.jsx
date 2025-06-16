@@ -9,6 +9,7 @@ import { RiArrowGoBackLine, RiArrowGoForwardLine } from 'react-icons/ri'
 import { LuPencilLine } from 'react-icons/lu'
 import copy from 'copy-to-clipboard'
 import { motion, AnimatePresence } from 'motion/react'
+import { QRCodeCanvas } from 'qrcode.react'
 
 const Game = () => {
 
@@ -17,6 +18,16 @@ const Game = () => {
   const [mistakes, setMistakes] = useState(0)
   const sessionId = '12345'
   const multiplayerLink = typeof window !== 'undefined' ? `${window.location.origin}/game/${sessionId}` : ''
+  const initialGrid = Array(81).fill(null)
+  const solution = Array(81).fill(null)
+  const [userGrid, setUserGrid] = useState(Array(81).fill(null))
+  const [selectedCell, setSelectedCell] = useState(null)
+  const [notesGrid, setNotesGrid] = useState(Array(81).fill(new Set()))
+  const [isNoteMode, setIsNoteMode] = useState(false)
+  const [undoStack, setUndoStack] = useState([]);
+  const [redoStack, setRedoStack] = useState([]);
+  const [penMode, setPenMode] = useState(false)
+
 
   // ---------------- copy button animation ---------------
 
@@ -71,7 +82,95 @@ const Game = () => {
     return `${pad(hours)}:${pad(minutes)}:${pad(seconds)}`
   }
 
-  // ----------------  Logic ---------------
+  // ---------------- Sudoku Logic ---------------
+
+  const saveState = () => {
+    setUndoStack(prev => [...prev, { userGrid: [...userGrid], notesGrid: notesGrid.map(set => new Set(set)) }]);
+    setRedoStack([]);
+  };
+
+  const isCellWrong = (idx) => {
+    if (userGrid[idx] === null) return false;
+    return userGrid[idx] !== solution[idx];
+  }
+
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (selectedCell === null) return;
+
+      const row = Math.floor(selectedCell / 9);
+      const col = selectedCell % 9;
+
+      const moveTo = (newRow, newCol) => {
+        let newIdx = newRow * 9 + newCol;
+        if (initialGrid[newIdx] === null) {
+          setSelectedCell(newIdx);
+        } else {
+          // Try to find next editable cell
+          setSelectedCell(findNextEditable(newRow, newCol));
+        }
+      };
+
+      const findNextEditable = (startRow, startCol, dirRow = 0, dirCol = 1) => {
+        let r = startRow;
+        let c = startCol;
+        while (true) {
+          c += dirCol;
+          r += dirRow;
+
+          if (c >= 9) { c = 0; r++; }
+          if (c < 0) { c = 8; r--; }
+          if (r >= 9) r = 0;
+          if (r < 0) r = 8;
+
+          const idx = r * 9 + c;
+          if (initialGrid[idx] === null) return idx;
+          if (r === startRow && c === startCol) return selectedCell;
+        }
+      };
+
+      switch (e.key) {
+        case 'ArrowUp':
+          moveTo((row - 1 + 9) % 9, col);
+          break;
+        case 'ArrowDown':
+          moveTo((row + 1) % 9, col);
+          break;
+        case 'ArrowLeft':
+          moveTo(row, (col - 1 + 9) % 9);
+          break;
+        case 'ArrowRight':
+          moveTo(row, (col + 1) % 9);
+          break;
+        case 'Tab':
+          e.preventDefault();
+          if (e.shiftKey) {
+            moveTo(row, (col - 1 + 9) % 9);
+          } else {
+            moveTo(row, (col + 1) % 9);
+          }
+          break;
+        case 'Delete':
+        case 'Backspace':
+          if (initialGrid[selectedCell] === null) {
+            const updatedGrid = [...userGrid];
+            updatedGrid[selectedCell] = null;
+            setUserGrid(updatedGrid);
+          }
+          break;
+        case 'Escape':
+          setSelectedCell(null);
+          break;
+        default:
+          break;
+      }
+    };
+
+    document.addEventListener('keydown', handleKeyDown);
+    return () => document.removeEventListener('keydown', handleKeyDown);
+  }, [selectedCell, userGrid, initialGrid]);
+
+  // ---------------- Socket Logic ---------------
 
   return (
     <div className='flex justify-center mb-10'>
@@ -128,9 +227,179 @@ const Game = () => {
               >
                 <FaCheck className='text-xl' />
               </motion.span>
-
             </motion.button>
+
+            <span className='w-full text-sm text-slate-400 inter-regular text-center mt-4 text-wrap'>Share link to play together</span>
+            <div className='mt-4 bg-white p-2 rounded'>
+              <QRCodeCanvas value={multiplayerLink} size={128} bgColor={'#ffffff'} fgColor={'#000000'} />
+            </div>
+            <span className='w-full text-sm text-slate-400 inter-regular text-center mt-4 text-wrap'>Scan code to join game</span>
           </div>
+
+          <div className='max-w-[65%] max-h-full'>
+            <div className='grid grid-cols-9 w-full h-full aspect-square gap-0'>
+              {initialGrid.map((cell, idx) => {
+                const rowIndex = Math.floor(idx / 9)
+                const colIndex = idx % 9
+                const isThickTop = rowIndex % 3 === 0
+                const isThickLeft = colIndex % 3 === 0
+                const isThickBottom = rowIndex === 8
+                const isThickRight = colIndex === 8
+
+                const cellValue = cell ?? userGrid[idx]
+                const isEditable = cell === null
+
+                const isSelected = selectedCell === idx
+
+                let bgColor = ''
+                if (!isEditable) {
+                  bgColor = 'bg-[#060e22] font-bold';
+                } else if (isCellWrong(idx)) {
+                  bgColor = 'bg-red-400 caret-white';
+                } else if (isSelected) {
+                  bgColor = 'bg-[#1b2131]';
+                } else {
+                  bgColor = 'bg-[#020817] caret-transparent';
+                }
+
+                return (
+                  <div
+                    key={idx}
+                    className={`flex items-center justify-center w-full h-full text-center text-lg border border-[#2e3e5a] dark:border-[#25334d] dark:text-white focus:outline-none cursor-default
+                      ${isThickTop ? 'border-t-[3px] border-t-[#2e3e5a]' : ''}
+                      ${isThickLeft ? 'border-l-[3px] border-l-[#2e3e5a]' : ''}
+                      ${isThickBottom ? 'border-b-[3px] border-b-[#2e3e5a]' : ''}
+                      ${isThickRight ? 'border-r-[3px] border-r-[#2e3e5a]' : ''}
+                      ${bgColor}`}
+                    onClick={() => {
+                      if (!isEditable) return
+                      setSelectedCell(selectedCell === idx ? null : idx)
+                    }}
+                  >
+                    {cellValue ? (
+                      <span className="text-xl">{cellValue}</span>
+                    ) : (
+                      <div className="flex flex-wrap justify-center text-[10px] leading-3 text-gray-400 min-h-[36px] w-full">
+                        {[1, 2, 3, 4, 5, 6, 7, 8, 9].map(n => (
+                          <span key={n} className={`w-1/3 text-center ${notesGrid[idx]?.has(n) ? '' : 'opacity-0'}`}>
+                            {n}
+                          </span>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                )
+              })}
+            </div>
+          </div>
+
+          <div className='w-full h-full flex flex-col items-center justify-between gap-3'>
+
+            <div className='grid grid-cols-5 w-full gap-2'>
+              {[...Array(9)].map((_, i) => (
+                <button
+                  key={i + 1}
+                  className='w-full aspect-square py-3 bg-slate-300 dark:bg-[#152237] dark:text-gray-500 text-black rounded text-xl font-semibold hover:bg-slate-400 dark:hover:bg-[#101929] duration-200 dark:hover:text-white transition'
+                  onClick={() => {
+                    if (selectedCell === null) return
+
+                    saveState();
+
+                    if (penMode) {
+                      const updatedNotes = [...notesGrid];
+                      const currentNotes = new Set(updatedNotes[selectedCell]);
+
+                      const newNotes = new Set(currentNotes);
+                      if (newNotes.has(i + 1)) {
+                        newNotes.delete(i + 1);
+                      } else {
+                        newNotes.add(i + 1);
+                      }
+
+                      updatedNotes[selectedCell] = newNotes;
+                      setNotesGrid(updatedNotes);
+                    } else {
+                      const updatedGrid = [...userGrid];
+                      updatedGrid[selectedCell] = i + 1;
+
+                      if (i + 1 !== solution[selectedCell]) {
+                        setMistakes(prev => prev + 1);
+                      }
+
+                      setUserGrid(updatedGrid);
+
+                    }
+                  }}
+                >
+                  {i + 1}
+                </button>
+              ))}
+              <button
+                className='w-full py-3 bg-slate-300 dark:bg-[#152237] dark:text-gray-500 text-black rounded text-xl font-semibold hover:bg-slate-400 dark:hover:bg-[#101929] duration-200 dark:hover:text-white transition flex items-center justify-center'
+                onClick={() => {
+                  if (selectedCell === null) return
+
+                  saveState();
+
+                  const updatedGrid = [...userGrid];
+                  updatedGrid[selectedCell] = null;
+
+                  const updatedNotes = [...notesGrid];
+                  updatedNotes[selectedCell] = new Set();
+
+                  setUserGrid(updatedGrid);
+                  setNotesGrid(updatedNotes);
+
+                }}
+              >
+                <FaBackspace className='text-2xl mr-[1px]' />
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div className='flex items-center justify-center w-full gap-32 mt-5'>
+          <button
+            onClick={() => {
+              if (undoStack.length === 0) return
+
+              const prevState = undoStack[undoStack.length - 1];
+              setUndoStack(prev => prev.slice(0, -1));
+              setRedoStack(prev => [...prev, { userGrid: [...userGrid], notesGrid: notesGrid.map(set => new Set(set)) }]);
+
+              setUserGrid(prevState.userGrid);
+              setNotesGrid(prevState.notesGrid);
+            }}
+            className='flex w-16 aspect-square items-center justify-center rounded-xl text-2xl bg-slate-300 dark:bg-transparent border-2 border-[#324465] hover:border-[#152237] dark:text-gray-500 text-black hover:bg-slate-300 dark:hover:bg-[#152237] duration-200 dark:hover:text-white transition'
+          >
+            <RiArrowGoBackLine />
+          </button>
+
+          <button
+            onClick={() => {
+              if (redoStack.length === 0) return
+
+              const nextState = redoStack[redoStack.length - 1];
+              setRedoStack(prev => prev.slice(0, -1));
+              setUndoStack(prev => [...prev, { userGrid: [...userGrid], notesGrid: notesGrid.map(set => new Set(set)) }]);
+
+              setUserGrid(nextState.userGrid);
+              setNotesGrid(nextState.notesGrid);
+            }}
+            className='flex w-16 aspect-square items-center justify-center rounded-xl text-2xl bg-slate-300 dark:bg-transparent border-2 border-[#324465] hover:border-[#152237] dark:text-gray-500 text-black hover:bg-slate-300 dark:hover:bg-[#152237] duration-200 dark:hover:text-white transition'
+          >
+            <RiArrowGoForwardLine />
+          </button>
+
+          <button
+            onClick={() => setPenMode(prev => !prev)}
+            className='relative flex w-16 aspect-square items-center justify-center rounded-xl text-2xl bg-slate-300 dark:bg-transparent border-2 border-[#324465] hover:border-[#152237] dark:text-gray-500 text-black hover:bg-slate-300 dark:hover:bg-[#152237] duration-200 dark:hover:text-white transition'
+          >
+            <div className={`absolute top-[-10px] right-[-10px] bg-gray-600 ${penMode ? 'text-green-300' : 'text-slate-300'} text-xs rounded-full px-2 py-1 inter-semibold`}>
+              {penMode ? 'On' : 'Off'}
+            </div>
+            <LuPencilLine />
+          </button>
         </div>
 
       </div>
