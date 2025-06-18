@@ -14,15 +14,15 @@ import ChatBox from './ChatBox'
 import { createSession, subscribeToSession, updateSession } from '@/firebase/firestoreUtils'
 import { useParams } from 'next/navigation'
 
-const Game = () => {
+const Game = ({ puzzle, sol }) => {
 
   const [pause, setPause] = useState(false)
   const [timeInSeconds, setTimeInSeconds] = useState(0)
   const [mistakes, setMistakes] = useState(0)
   const sessionId = '12345'
   const multiplayerLink = typeof window !== 'undefined' ? `${window.location.origin}/game/${sessionId}` : ''
-  const initialGrid = Array(81).fill(null)
-  const solution = Array(81).fill(null)
+  const initialGrid = puzzle.map((cell) => (cell === null ? null : cell))
+  const solution = sol.map((cell) => (cell === null ? null : cell))
   const [userGrid, setUserGrid] = useState(Array(81).fill(null))
   const [selectedCell, setSelectedCell] = useState(null)
   const [notesGrid, setNotesGrid] = useState(Array(81).fill(new Set()))

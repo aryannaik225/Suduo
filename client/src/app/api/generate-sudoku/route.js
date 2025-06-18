@@ -32,8 +32,7 @@ export async function GET(request) {
     JSON.stringify({
       puzzle: puzzle.map((cell) => (cell === null ? null : cell + 1)),
       solution: solution.map((cell) => (cell === null ? null : cell + 1)),
-      difficultyRating: rating[0],
-      difficulty: difficulty, // sending back user difficulty label too
+      difficultyRating: rating[0], // sending back user difficulty label too
     }),
     { headers: { "Content-Type": "application/json" } }
   );

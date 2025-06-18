@@ -59,6 +59,18 @@ export default function Home() {
         hostPfp: `/profile_avatars/pfp${Math.floor(Math.random() * 16) + 1}.svg`,
       }));
 
+      const res = await axios.get(`/api/generate-sudoku?difficulty=${difficulty}`);
+      const { puzzle, solution, difficultyRating } = res.data;
+      if (!puzzle || !solution) {
+        throw new Error('Failed to generate puzzle');
+      }
+      localStorage.setItem('puzzleData', JSON.stringify({
+        sessionId,
+        puzzle,
+        solution,
+        difficultyRating,
+      }));
+
       setLoading(false);
       setReady(true);
 
