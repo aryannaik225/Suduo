@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import { FaRegCirclePlay, FaRegCirclePause, FaCheck } from 'react-icons/fa6'
 import { IoSettingsOutline } from 'react-icons/io5'
 import { IoIosLink } from 'react-icons/io'
@@ -19,7 +19,6 @@ const Game = ({ puzzle, sol }) => {
   const [pause, setPause] = useState(false)
   const [timeInSeconds, setTimeInSeconds] = useState(0)
   const [mistakes, setMistakes] = useState(0)
-  const sessionId = '12345'
   const multiplayerLink = typeof window !== 'undefined' ? `${window.location.origin}/game/${sessionId}` : ''
   const initialGrid = puzzle.map((cell) => (cell === null ? null : cell))
   const solution = sol.map((cell) => (cell === null ? null : cell))
@@ -30,6 +29,8 @@ const Game = ({ puzzle, sol }) => {
   const [undoStack, setUndoStack] = useState([]);
   const [redoStack, setRedoStack] = useState([]);
   const [penMode, setPenMode] = useState(false)
+
+  
 
 
   // ---------------- copy button animation ---------------
@@ -61,6 +62,7 @@ const Game = ({ puzzle, sol }) => {
 
 
   // ---------------- Timer Logic ---------------
+
   useEffect(() => {
     let interval = null
 
@@ -175,7 +177,74 @@ const Game = ({ puzzle, sol }) => {
 
   // ---------------- Firebase Logic ---------------
 
+  const { sessionId } = useParams()
+  const debounceRef = useRef(null)
+  const playerIdRef = useRef(null)
 
+  useEffect(() => {
+    if (!playerIdRef.current) {
+      playerIdRef.current = nanoid(10)
+    }
+  })
+
+  useEffect(() => {
+    if (!sessionId) return
+
+    const initialState = {
+      initialGrid: initialGrid,
+      solution: solution,
+      userGrid: userGrid,
+      notesGrid: notesGrid.map(set => Array.from(set)),
+      mistakes: mistakes,
+      pause: pause,
+      undoStack: undoStack,
+      redoStack: redoStack,
+    }
+
+    createSession(sessionId, initialState)
+
+  }, [sessionId])
+
+
+  useEffect(() => {
+
+    if (!sessionId) return
+
+    const unsubscribe = subscribeToSession(sessionId, (data) => {
+      if ( !data || data.lastUpdatedBy === playerIdRef.current ) return
+
+      setUserGrid(data.userGrid)
+      setNotesGrid(data.notesGrid.map(arr => new Set(arr)))
+      setMistakes(data.mistakes)
+      setPause(data.pause)
+      setUndoStack(data.undoStack)
+      setRedoStack(data.redoStack)
+
+    })
+
+    return () => {
+      unsubscribe()
+    }
+
+  }, [sessionId])
+
+  useEffect(() => {
+    if (!sessionId) return
+
+    if (debounceRef.current) clearTimeout(debounceRef.current)
+    debounceRef.current = setTimeout(() => {
+      updateSession(sessionId, {
+        userGrid: userGrid,
+        notesGrid: notesGrid.map(set => Array.from(set)),
+        mistakes: mistakes,
+        pause: pause,
+        undoStack: undoStack,
+        redoStack: redoStack,
+        lastUpdatedBy: playerIdRef.current,
+      })
+    }, 500)
+
+  }, [userGrid, notesGrid, mistakes, pause, undoStack, redoStack, sessionId])
 
 
 
@@ -189,7 +258,7 @@ const Game = ({ puzzle, sol }) => {
               onClick={() => setPause(!pause)}
             />
             <FaRegCirclePause
-              className={`text-slate-400 text-2xl cursor-pointer hover:scale-110 duration-200 ${pause ? 'hidden' : 'pause'}`}
+              className={`text-slate-400 text-2xl cursor-pointer hover:scale-110 duration-200 ${pause ? 'hidden' : 'block'}`}
               onClick={() => setPause(!pause)}
             />
             <span className='text-slate-400 inter-semibold text-base'>{formatTime(timeInSeconds)}</span>
