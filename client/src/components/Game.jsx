@@ -272,11 +272,11 @@ const Game = ({ puzzle, sol }) => {
                 return (
                   <div
                     key={idx}
-                    className={`flex items-center justify-center w-full h-full text-center text-lg border border-[#2e3e5a] dark:border-[#25334d] dark:text-white focus:outline-none cursor-default
-                      ${isThickTop ? 'border-t-[3px] border-t-[#2e3e5a]' : ''}
-                      ${isThickLeft ? 'border-l-[3px] border-l-[#2e3e5a]' : ''}
-                      ${isThickBottom ? 'border-b-[3px] border-b-[#2e3e5a]' : ''}
-                      ${isThickRight ? 'border-r-[3px] border-r-[#2e3e5a]' : ''}
+                    className={`flex items-center justify-center aspect-square w-full h-full text-center text-lg border border-[#2e3e5a] dark:border-[#25334d] dark:text-white focus:outline-none cursor-default
+                      ${isThickTop ? 'border-t-[3px] dark:border-t-[#3e434c]' : ''}
+                      ${isThickLeft ? 'border-l-[3px] dark:border-l-[#3e434c]' : ''}
+                      ${isThickBottom ? 'border-b-[3px] dark:border-b-[#3e434c]' : ''}
+                      ${isThickRight ? 'border-r-[3px] dark:border-r-[#3e434c]' : ''}
                       ${bgColor}`}
                     onClick={() => {
                       if (!isEditable) return
