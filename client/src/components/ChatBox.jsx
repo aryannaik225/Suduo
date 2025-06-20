@@ -5,15 +5,26 @@ import Pusher from 'pusher-js'
 import React, { useRef, useState, useEffect } from 'react'
 import { IoSend } from 'react-icons/io5'
 
-const ChatBox = ({ roomId }) => {
+const ChatBox = ({ roomId, playersList = [] }) => {
 
   const [messages, setMessages] = useState([])
   const [input, setInput] = useState('')
   const bottomRef = useRef(null)
-  const username = 'Aryan'
-  const pfp = '/profile_avatars/pfp1.svg'
+  const [username, setUsername] = useState('')
+  const [pfp, setPfp] = useState('/profile_avatars/pfp1.svg')
+  const avatarMap = new Map(playersList.map(player => [player.username, player.avatar]));
 
   const sanitizedRoomId = roomId.replace(/\s+/g, '-');
+
+  useEffect(() => {
+    const data = localStorage.getItem('hostData') || localStorage.getItem('playerData');
+    if (data) {
+      const { playerUsername, hostUsername, playerPfp, hostPfp } = JSON.parse(data);
+      setUsername(playerUsername || hostUsername);
+      setPfp(playerPfp || hostPfp);
+    }
+  }, []);
+
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -63,7 +74,7 @@ const ChatBox = ({ roomId }) => {
     <div className='h-full w-full rounded border-[2px] border-[#324465] flex flex-col pb-3 bg-[#0a162f]'>
 
       <div className='flex items-center justify-end p-3 w-full flex-wrap gap-3'>
-        <div className='relative group'>
+        {/* <div className='relative group'>
           <Image
             width={30}
             height={30}
@@ -74,7 +85,21 @@ const ChatBox = ({ roomId }) => {
           <span className='absolute bottom-full mb-2 left-1/2 -translate-x-1/2 bg-gray-800 text-white text-sm px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200 whitespace-nowrap z-10'>
             Aryan
           </span>
-        </div>
+        </div> */}
+        {playersList.map((player, idx) => (
+          <div key={idx} className='relative group'>
+            <Image
+              width={30}
+              height={30}
+              src={avatarMap.get(player.username) || '/profile_avatars/pfp1.svg'}
+              alt='profile avatar'
+              className='rounded-full outline-[3px] outline-blue-400 outline-offset-2'
+            />
+            <span className='absolute bottom-full mb-2 left-1/2 -translate-x-1/2 bg-gray-800 text-white text-sm px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200 whitespace-nowrap z-10'>
+              {player.username}
+            </span>
+          </div>
+        ))}
       </div>
 
       <div className='w-full h-[1px] bg-[#324465]' />
@@ -87,7 +112,7 @@ const ChatBox = ({ roomId }) => {
               <Image
                 width={30}
                 height={30}
-                src={msg.pfp}
+                src={avatarMap.get(msg.username) || '/profile_avatars/pfp1.svg'}
                 alt="pfp"
                 className="rounded-full"
               />
