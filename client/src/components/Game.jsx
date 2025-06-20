@@ -12,7 +12,7 @@ import { motion, AnimatePresence } from 'motion/react'
 import { QRCodeCanvas } from 'qrcode.react'
 import ChatBox from './ChatBox'
 import { createSession, subscribeToSession, updateSession } from '@/firebase/firestoreUtils'
-import { useParams } from 'next/navigation'
+import { useParams, useRouter } from 'next/navigation'
 
 const Game = ({ puzzle, sol }) => {
 
@@ -28,7 +28,7 @@ const Game = ({ puzzle, sol }) => {
   const [undoStack, setUndoStack] = useState([]);
   const [redoStack, setRedoStack] = useState([]);
   const [penMode, setPenMode] = useState(false)
-
+  const router = useRouter()
 
   // ---------------- Player Logic ---------------
 
@@ -53,8 +53,17 @@ const Game = ({ puzzle, sol }) => {
       }
     }
 
-
   }, [])
+
+  useEffect(() => {
+    const hostData = localStorage.getItem('hostData')
+    const playerData = localStorage.getItem('playerData')
+
+    if (!hostData && !playerData && sessionId) {
+      const redirectUrl = `${window.location.origin}/game/${sessionId}/inputTaker`;
+      router.replace(redirectUrl)
+    }
+  })
 
 
   // ---------------- copy button animation ---------------
@@ -203,15 +212,8 @@ const Game = ({ puzzle, sol }) => {
   // ---------------- Firebase Logic ---------------
 
   const { sessionId } = useParams()
-  const multiplayerLink = typeof window !== 'undefined' ? `${window.location.origin}/game/${sessionId}` : ''
+  const multiplayerLink = typeof window !== 'undefined' ? `${window.location.origin}/game/${sessionId}/inputTaker` : ''
   const debounceRef = useRef(null)
-  // const playerIdRef = useRef(null)
-
-  // useEffect(() => {
-  //   if (!playerIdRef.current) {
-  //     playerIdRef.current = nanoid(10)
-  //   }
-  // })
 
   useEffect(() => {
     if (!sessionId) return
@@ -285,6 +287,61 @@ const Game = ({ puzzle, sol }) => {
     }, 500)
 
   }, [userGrid, notesGrid, mistakes, pause, undoStack, redoStack, sessionId])
+
+
+  // ---------------- Players Leave Logic ---------------
+
+  const cleanupBeforeUnload = async () => {
+    if (!sessionId) return;
+
+    const playerData = localStorage.getItem('playerData');
+    const hostData = localStorage.getItem('hostData');
+
+    let leavingPlayerId = null;
+
+    if (playerData) {
+      const { playerId } = JSON.parse(playerData);
+      leavingPlayerId = playerId;
+    } else if (hostData) {
+      const { hostId } = JSON.parse(hostData);
+      leavingPlayerId = hostId;
+    } else {
+      return;
+    }
+
+    try {
+      const session = await getSessionData(sessionId);
+      if (!session?.players) return;
+
+      const updatedPlayers = session.players.filter(p => p.id !== leavingPlayerId);
+
+      await updateSession(sessionId, { players: updatedPlayers });
+
+      if (playerData) {
+        localStorage.removeItem('playerData');
+      } else if (hostData) {
+        localStorage.removeItem('hostData');
+      }
+
+    } catch (err) {
+      console.error('Error during cleanup:', err);
+    }
+  };
+
+
+  useEffect(() => {
+    const handleUnload = (e) => {
+      e.preventDefault();
+      cleanupBeforeUnload();
+    };
+
+    window.addEventListener('beforeunload', handleUnload);
+
+    return () => {
+      cleanupBeforeUnload();
+      window.removeEventListener('beforeunload', handleUnload);
+    };
+  }, [sessionId]);
 
 
 

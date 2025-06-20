@@ -1,4 +1,4 @@
-import { doc, setDoc, getDoc, onSnapshot, updateDoc } from "firebase/firestore"
+import { doc, setDoc, getDoc, onSnapshot, updateDoc, arrayUnion } from "firebase/firestore"
 import { db } from "./config"
 
 export const createSession = async (sessionId, initialState) => {
@@ -24,3 +24,10 @@ export const getSessionData = async (sessionId) => {
   if (sessionSnap.exists()) return sessionSnap.data()
   return null
 }
+
+export const addPlayerToSession = async (sessionId, player) => {
+  const sessionRef = doc(db, "sessions", sessionId)
+  await updateDoc(sessionRef, {
+    players: arrayUnion(player)
+  })
+} 

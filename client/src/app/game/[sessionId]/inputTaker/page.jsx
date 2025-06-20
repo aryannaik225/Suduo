@@ -6,7 +6,7 @@ import { FaSpinner } from "react-icons/fa"
 import { ToastContainer, toast } from "react-toastify"
 import 'react-toastify/dist/ReactToastify.css'
 import { nanoid } from "nanoid"
-import { getSessionData, updateSession } from "@/firebase/firestoreUtils"
+import { addPlayerToSession, getSessionData, updateSession } from "@/firebase/firestoreUtils"
 
 export default function Home() {
 
@@ -103,11 +103,13 @@ export default function Home() {
         joinedAt: Date.now(),
       }
 
-      const updatePlayers = [...(sessionData.players || []), newPlayer]
+      // const updatePlayers = [...(sessionData.players || []), newPlayer]
 
-      await updateSession(sessionId, {
-        players: updatePlayers,
-      })
+      // await updateSession(sessionId, {
+      //   players: updatePlayers,
+      // })
+
+      await addPlayerToSession(sessionId, newPlayer)
 
 
       localStorage.setItem('playerData', JSON.stringify({
