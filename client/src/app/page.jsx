@@ -51,10 +51,12 @@ export default function Home() {
     try {
 
       const sessionId = nanoid()
+      const hostId = nanoid(10)
 
       localStorage.setItem('hostData', JSON.stringify({
         sessionId,
         difficulty,
+        hostId,
         hostUsername: name,
         hostPfp: `/profile_avatars/pfp${Math.floor(Math.random() * 16) + 1}.svg`,
       }));

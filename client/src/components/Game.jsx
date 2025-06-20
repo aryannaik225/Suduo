@@ -29,7 +29,32 @@ const Game = ({ puzzle, sol }) => {
   const [redoStack, setRedoStack] = useState([]);
   const [penMode, setPenMode] = useState(false)
 
-  
+
+  // ---------------- Player Logic ---------------
+
+  const [playersList, setPlayersList] = useState([])
+  const [playerId, setPlayerId] = useState('') // This will be the player id of the current user
+
+  useEffect(() => {
+    const hostDataa = localStorage.getItem('hostData')
+    if (hostDataa) {
+      const { hostIdd } = JSON.parse(hostDataa)
+      if (hostIdd) {
+        setPlayerId(hostIdd)
+        return
+      }
+    }
+
+    const playerDataa = localStorage.getItem('playerData')
+    if (playerDataa) {
+      const { playerIdd } = JSON.parse(playerDataa)
+      if (playerIdd) {
+        setPlayerId(playerIdd)
+      }
+    }
+
+
+  }, [])
 
 
   // ---------------- copy button animation ---------------
@@ -174,21 +199,27 @@ const Game = ({ puzzle, sol }) => {
     return () => document.removeEventListener('keydown', handleKeyDown);
   }, [selectedCell, userGrid, initialGrid]);
 
+
   // ---------------- Firebase Logic ---------------
 
   const { sessionId } = useParams()
   const multiplayerLink = typeof window !== 'undefined' ? `${window.location.origin}/game/${sessionId}` : ''
   const debounceRef = useRef(null)
-  const playerIdRef = useRef(null)
+  // const playerIdRef = useRef(null)
 
-  useEffect(() => {
-    if (!playerIdRef.current) {
-      playerIdRef.current = nanoid(10)
-    }
-  })
+  // useEffect(() => {
+  //   if (!playerIdRef.current) {
+  //     playerIdRef.current = nanoid(10)
+  //   }
+  // })
 
   useEffect(() => {
     if (!sessionId) return
+
+    const hostData = localStorage.getItem('hostData')
+    if (!hostData) return
+    const { hostId, hostUsername, hostPfp } = JSON.parse(hostData)
+    if (!hostId || !hostUsername || !hostPfp) return
 
     const initialState = {
       initialGrid: initialGrid,
@@ -199,9 +230,17 @@ const Game = ({ puzzle, sol }) => {
       pause: pause,
       undoStack: undoStack,
       redoStack: redoStack,
+      players: [{
+        id: hostId,
+        username: hostUsername,
+        avatar: hostPfp,
+        joinedAt: Date.now()
+      }]
     }
 
     createSession(sessionId, initialState)
+
+    setPlayersList(initialState.players)
 
   }, [sessionId])
 
@@ -211,7 +250,7 @@ const Game = ({ puzzle, sol }) => {
     if (!sessionId) return
 
     const unsubscribe = subscribeToSession(sessionId, (data) => {
-      if ( !data || data.lastUpdatedBy === playerIdRef.current ) return
+      if (!data || data.lastUpdatedBy === playerId) return
 
       setUserGrid(data.userGrid)
       setNotesGrid(data.notesGrid.map(arr => new Set(arr)))
@@ -219,6 +258,7 @@ const Game = ({ puzzle, sol }) => {
       setPause(data.pause)
       setUndoStack(data.undoStack)
       setRedoStack(data.redoStack)
+      setPlayersList(data.players || [])
 
     })
 
@@ -240,7 +280,7 @@ const Game = ({ puzzle, sol }) => {
         pause: pause,
         undoStack: undoStack,
         redoStack: redoStack,
-        lastUpdatedBy: playerIdRef.current,
+        lastUpdatedBy: playerId,
       })
     }, 500)
 

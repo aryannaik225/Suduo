@@ -17,3 +17,10 @@ export const updateSession = async (sessionId, updates) => {
   const sessionRef = doc(db, "sessions", sessionId)
   await updateDoc(sessionRef, { ...updates, updatedAt: Date.now() })
 }
+
+export const getSessionData = async (sessionId) => {
+  const sessionRef = doc(db, "sessions", sessionId)
+  const sessionSnap = await getDoc(sessionRef)
+  if (sessionSnap.exists()) return sessionSnap.data()
+  return null
+}

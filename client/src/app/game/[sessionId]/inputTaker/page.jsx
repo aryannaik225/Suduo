@@ -5,6 +5,8 @@ import { useEffect, useState } from "react"
 import { FaSpinner } from "react-icons/fa"
 import { ToastContainer, toast } from "react-toastify"
 import 'react-toastify/dist/ReactToastify.css'
+import { nanoid } from "nanoid"
+import { getSessionData, updateSession } from "@/firebase/firestoreUtils"
 
 export default function Home() {
 
@@ -29,7 +31,9 @@ export default function Home() {
     localStorage.setItem('theme', theme)
   }, [theme])
 
-  const handleStartGame = () => {
+
+
+  const handleStartGame = async () => {
     if (!name) {
       toast.error('Please enter your username.', {
         position: 'top-center',
@@ -50,12 +54,91 @@ export default function Home() {
       return;
     }
 
-    localStorage.setItem('playerData', JSON.stringify({
-      sessionId,
-      palyerUsername: name,
-      playerPfp: `/profile_avatars/pfp${Math.floor(Math.random() * 16) + 1}.svg`,
-    }));
+    setLoading(true)
+
+    let playerId = nanoid(10)
+    const playerPfp = `/profile_avatars/pfp${Math.floor(Math.random() * 16) + 1}.svg`
+
+    try {
+
+      const sessionData = await getSessionData(sessionId)
+      if (!sessionData) {
+        toast.error('Session not found.', {
+          position: 'top-center',
+          autoClose: 3000,
+          pauseOnHover: true,
+          theme: theme === 'dark' ? 'dark' : 'light'
+        });
+        setLoading(false)
+        return
+      }
+
+      let loopLimit = 10;
+      while (loopLimit--) {
+        const matchingPlayer = sessionData.players?.find(player => player.id === playerId);
+
+        if (!matchingPlayer) {
+          break;
+        }
+
+        if (matchingPlayer.username === name) {
+          toast.error('A player with this ID and name already exists.', {
+            position: 'top-center',
+            autoClose: 3000,
+            pauseOnHover: true,
+            theme: theme === 'dark' ? 'dark' : 'light',
+          });
+          setLoading(false);
+          return;
+        }
+
+        playerId = nanoid(10);
+      }
+
+
+      const newPlayer = {
+        id: playerId,
+        username: name,
+        avatar: playerPfp,
+        joinedAt: Date.now(),
+      }
+
+      const updatePlayers = [...(sessionData.players || []), newPlayer]
+
+      await updateSession(sessionId, {
+        players: updatePlayers,
+      })
+
+
+      localStorage.setItem('playerData', JSON.stringify({
+        sessionId,
+        playerId: playerId,
+        playerUsername: name,
+        playerPfp: playerPfp,
+      }));
+
+      setLoading(false)
+
+      setTimeout(() => {
+        router.push(`/game/${sessionId}`)
+      }, 1000)
+
+    } catch (error) {
+      console.error(error)
+      toast.error('Failed to join session.', {
+        position: 'top-center',
+        autoClose: 3000,
+        pauseOnHover: true,
+        theme: theme === 'dark' ? 'dark' : 'light'
+      });
+    } finally {
+      setLoading(false)
+    }
   }
+
+
+
+
 
   return (
     <div className="w-screen h-screen flex justify-center items-center">
@@ -77,7 +160,7 @@ export default function Home() {
 
         <button
           onClick={handleStartGame}
-          className="mt-5 w0full py-3 bg-gray-800 text-white rouned-lg text-[15px] inter-regular hover:bg-gray-700 duration-200 transition flex justify-center items-center"
+          className="mt-5 w-full py-3 bg-gray-800 text-white rouned-lg text-[15px] inter-regular hover:bg-gray-700 duration-200 transition flex justify-center items-center"
           disabled={!name || loading}
         >
           {loading
