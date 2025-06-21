@@ -1,4 +1,4 @@
-import { doc, setDoc, getDoc, onSnapshot, updateDoc, arrayUnion } from "firebase/firestore"
+import { doc, setDoc, getDoc, onSnapshot, updateDoc, arrayUnion, deleteDoc } from "firebase/firestore"
 import { db } from "./config"
 
 export const createSession = async (sessionId, initialState) => {
@@ -31,3 +31,12 @@ export const addPlayerToSession = async (sessionId, player) => {
     players: arrayUnion(player)
   })
 } 
+
+export const deleteSession = async (sessionId) => {
+  try {
+    const sessionRef = doc(db, "sessions", sessionId)
+    await deleteDoc(sessionRef)
+  } catch (error) {
+    console.error("Error deleting session:", error)
+  }
+}

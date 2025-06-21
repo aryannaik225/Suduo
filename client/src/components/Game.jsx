@@ -11,7 +11,7 @@ import copy from 'copy-to-clipboard'
 import { motion, AnimatePresence } from 'motion/react'
 import { QRCodeCanvas } from 'qrcode.react'
 import ChatBox from './ChatBox'
-import { createSession, subscribeToSession, updateSession } from '@/firebase/firestoreUtils'
+import { createSession, deleteSession, subscribeToSession, updateSession } from '@/firebase/firestoreUtils'
 import { useParams, useRouter } from 'next/navigation'
 
 const Game = ({ puzzle, sol }) => {
@@ -322,6 +322,15 @@ const Game = ({ puzzle, sol }) => {
       } else if (hostData) {
         localStorage.removeItem('hostData');
       }
+
+      setTimeout(async () => {
+        const lastest = await getSessionData(sessionId);
+        if (lastest?.players?.length === 0) {
+          console.log('No players left, deleting session');
+          await deleteSession(sessionId);
+        }
+      }, 8000)
+
 
     } catch (err) {
       console.error('Error during cleanup:', err);
