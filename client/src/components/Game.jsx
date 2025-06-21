@@ -11,7 +11,7 @@ import copy from 'copy-to-clipboard'
 import { motion, AnimatePresence } from 'motion/react'
 import { QRCodeCanvas } from 'qrcode.react'
 import ChatBox from './ChatBox'
-import { createSession, deleteSession, subscribeToSession, updateSession } from '@/firebase/firestoreUtils'
+import { createSession, deleteSession, subscribeToSession, updateSession, getSessionData } from '@/firebase/firestoreUtils'
 import { useParams, useRouter } from 'next/navigation'
 
 const Game = ({ puzzle, sol }) => {
@@ -230,8 +230,14 @@ const Game = ({ puzzle, sol }) => {
       notesGrid: notesGrid.map(set => Array.from(set)),
       mistakes: mistakes,
       pause: pause,
-      undoStack: undoStack,
-      redoStack: redoStack,
+      undoStack: undoStack.map(entry => ({
+        userGrid: entry.userGrid,
+        notesGrid: entry.notesGrid.map(set => Array.from(set))
+      })),
+      redoStack: redoStack.map(entry => ({
+        userGrid: entry.userGrid,
+        notesGrid: entry.notesGrid.map(set => Array.from(set))
+      })),
       players: [{
         id: hostId,
         username: hostUsername,
@@ -258,8 +264,18 @@ const Game = ({ puzzle, sol }) => {
       setNotesGrid(data.notesGrid.map(arr => new Set(arr)))
       setMistakes(data.mistakes)
       setPause(data.pause)
-      setUndoStack(data.undoStack)
-      setRedoStack(data.redoStack)
+      setUndoStack(
+        (data.undoStack || []).map(entry => ({
+          userGrid: entry.userGrid,
+          notesGrid: entry.notesGrid.map(arr => new Set(arr))
+        }))
+      )
+      setRedoStack(
+        (data.redoStack || []).map(entry => ({
+          userGrid: entry.userGrid,
+          notesGrid: entry.notesGrid.map(arr => new Set(arr))
+        }))
+      )
       setPlayersList(data.players || [])
 
     })
@@ -280,8 +296,14 @@ const Game = ({ puzzle, sol }) => {
         notesGrid: notesGrid.map(set => Array.from(set)),
         mistakes: mistakes,
         pause: pause,
-        undoStack: undoStack,
-        redoStack: redoStack,
+        undoStack: undoStack.map(entry => ({
+          userGrid: entry.userGrid,
+          notesGrid: entry.notesGrid.map(set => Array.from(set))
+        })),
+        redoStack: redoStack.map(entry => ({
+          userGrid: entry.userGrid,
+          notesGrid: entry.notesGrid.map(set => Array.from(set))
+        })),
         lastUpdatedBy: playerId,
       })
     }, 500)
