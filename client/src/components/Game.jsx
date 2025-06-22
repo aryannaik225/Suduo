@@ -220,44 +220,51 @@ const Game = ({ puzzle, sol }) => {
   const debounceRef = useRef(null)
 
   useEffect(() => {
-    if (!sessionId) return
+    const initSession = async () => {
+      if (!sessionId) return
 
-    const hostData = localStorage.getItem('hostData')
-    if (!hostData) return
-    const { hostId, hostUsername, hostPfp } = JSON.parse(hostData)
-    if (!hostId || !hostUsername || !hostPfp) return
+      const hostData = localStorage.getItem('hostData')
+      if (!hostData) return
+      const { hostId, hostUsername, hostPfp } = JSON.parse(hostData)
+      if (!hostId || !hostUsername || !hostPfp) return
 
-    const initialState = {
-      initialGrid: initialGrid,
-      solution: solution,
-      userGrid: userGrid,
-      notesGrid: Object.fromEntries(
-        notesGrid.map((set, index) => [index, [...set]])
-      ),
-      mistakes: mistakes,
-      pause: pause,
-      undoStack: undoStack.map(entry => ({
-        userGrid: entry.userGrid,
-        notesGrid: Object.fromEntries(entry.notesGrid.map((set, idx) => [idx, Array.from(set)]))
-      })),
-      redoStack: redoStack.map(entry => ({
-        userGrid: entry.userGrid,
-        notesGrid: entry.notesGrid.map(set => Array.from(set))
-      })),
-      players: [{
-        id: hostId,
-        username: hostUsername,
-        avatar: hostPfp,
-        joinedAt: Date.now()
-      }]
+      const existing = await getSessionData(sessionId)
+      if (existing) return
+
+      const initialState = {
+        initialGrid: initialGrid,
+        solution: solution,
+        userGrid: userGrid,
+        notesGrid: Object.fromEntries(
+          notesGrid.map((set, index) => [index, [...set]])
+        ),
+        mistakes: mistakes,
+        pause: pause,
+        undoStack: undoStack.map(entry => ({
+          userGrid: entry.userGrid,
+          notesGrid: Object.fromEntries(entry.notesGrid.map((set, idx) => [idx, Array.from(set)]))
+        })),
+        redoStack: redoStack.map(entry => ({
+          userGrid: entry.userGrid,
+          notesGrid: entry.notesGrid.map(set => Array.from(set))
+        })),
+        players: [{
+          id: hostId,
+          username: hostUsername,
+          avatar: hostPfp,
+          joinedAt: Date.now()
+        }]
+      }
+
+      console.log('Creating session with ID:', sessionId)
+      await createSession(sessionId, initialState)
+      console.log('Session creation attempted with ID:', sessionId)
+
+      setPlayersList(initialState.players)
+
     }
 
-    console.log('Creating session with ID:', sessionId)
-    createSession(sessionId, initialState)
-    console.log('Session creation attempted with ID:', sessionId)
-
-    setPlayersList(initialState.players)
-
+    initSession()
   }, [sessionId])
 
 
@@ -277,13 +284,13 @@ const Game = ({ puzzle, sol }) => {
       setUndoStack(
         (data.undoStack || []).map(entry => ({
           userGrid: entry.userGrid,
-          notesGrid: entry.notesGrid.map(arr => new Set(arr))
+          notesGrid: Array(81).fill().map((_, idx) => new Set(entry.notesGrid?.[idx] || []))
         }))
       )
       setRedoStack(
         (data.redoStack || []).map(entry => ({
           userGrid: entry.userGrid,
-          notesGrid: entry.notesGrid.map(arr => new Set(arr))
+          notesGrid: Array(81).fill().map((_, idx) => new Set(entry.notesGrid?.[idx] || []))
         }))
       )
       setPlayersList(data.players || [])
