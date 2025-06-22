@@ -16,6 +16,7 @@ import { useParams, useRouter } from 'next/navigation'
 
 const Game = ({ puzzle, sol }) => {
 
+  const { sessionId } = useParams()
   const [pause, setPause] = useState(false)
   const [timeInSeconds, setTimeInSeconds] = useState(0)
   const [mistakes, setMistakes] = useState(0)
@@ -38,32 +39,36 @@ const Game = ({ puzzle, sol }) => {
   useEffect(() => {
     const hostDataa = localStorage.getItem('hostData')
     if (hostDataa) {
-      const { hostIdd } = JSON.parse(hostDataa)
-      if (hostIdd) {
-        setPlayerId(hostIdd)
+      const { hostId } = JSON.parse(hostDataa)
+      if (hostId) {
+        setPlayerId(hostId)
         return
       }
     }
 
     const playerDataa = localStorage.getItem('playerData')
     if (playerDataa) {
-      const { playerIdd } = JSON.parse(playerDataa)
-      if (playerIdd) {
-        setPlayerId(playerIdd)
+      const { playerId } = JSON.parse(playerDataa)
+      if (playerId) {
+        setPlayerId(playerId)
       }
     }
 
   }, [])
 
   useEffect(() => {
-    const hostData = localStorage.getItem('hostData')
-    const playerData = localStorage.getItem('playerData')
+    const timeout = setTimeout(() => {
+      const hostData = localStorage.getItem('hostData')
+      const playerData = localStorage.getItem('playerData')
 
-    if (!hostData && !playerData && sessionId) {
-      const redirectUrl = `${window.location.origin}/game/${sessionId}/inputTaker`;
-      router.replace(redirectUrl)
-    }
-  })
+      if (!hostData && !playerData && sessionId) {
+        const redirectUrl = `${window.location.origin}/game/${sessionId}/inputTaker`;
+        router.replace(redirectUrl)
+      }
+    }, 300);
+
+    return () => clearTimeout(timeout)
+  }, [sessionId])
 
 
   // ---------------- copy button animation ---------------
@@ -211,7 +216,6 @@ const Game = ({ puzzle, sol }) => {
 
   // ---------------- Firebase Logic ---------------
 
-  const { sessionId } = useParams()
   const multiplayerLink = typeof window !== 'undefined' ? `${window.location.origin}/game/${sessionId}/inputTaker` : ''
   const debounceRef = useRef(null)
 
@@ -227,12 +231,14 @@ const Game = ({ puzzle, sol }) => {
       initialGrid: initialGrid,
       solution: solution,
       userGrid: userGrid,
-      notesGrid: notesGrid.map(set => Array.from(set)),
+      notesGrid: Object.fromEntries(
+        notesGrid.map((set, index) => [index, [...set]])
+      ),
       mistakes: mistakes,
       pause: pause,
       undoStack: undoStack.map(entry => ({
         userGrid: entry.userGrid,
-        notesGrid: entry.notesGrid.map(set => Array.from(set))
+        notesGrid: Object.fromEntries(entry.notesGrid.map((set, idx) => [idx, Array.from(set)]))
       })),
       redoStack: redoStack.map(entry => ({
         userGrid: entry.userGrid,
@@ -246,7 +252,9 @@ const Game = ({ puzzle, sol }) => {
       }]
     }
 
+    console.log('Creating session with ID:', sessionId)
     createSession(sessionId, initialState)
+    console.log('Session creation attempted with ID:', sessionId)
 
     setPlayersList(initialState.players)
 
@@ -261,7 +269,9 @@ const Game = ({ puzzle, sol }) => {
       if (!data || data.lastUpdatedBy === playerId) return
 
       setUserGrid(data.userGrid)
-      setNotesGrid(data.notesGrid.map(arr => new Set(arr)))
+      setNotesGrid(
+        Array(81).fill().map((_, idx) => new Set(data.notesGrid?.[idx] || []))
+      )
       setMistakes(data.mistakes)
       setPause(data.pause)
       setUndoStack(
@@ -293,12 +303,14 @@ const Game = ({ puzzle, sol }) => {
     debounceRef.current = setTimeout(() => {
       updateSession(sessionId, {
         userGrid: userGrid,
-        notesGrid: notesGrid.map(set => Array.from(set)),
+        notesGrid: Object.fromEntries(
+          notesGrid.map((set, index) => [index, [...set]])
+        ),
         mistakes: mistakes,
         pause: pause,
         undoStack: undoStack.map(entry => ({
           userGrid: entry.userGrid,
-          notesGrid: entry.notesGrid.map(set => Array.from(set))
+          notesGrid: Object.fromEntries(entry.notesGrid.map((set, idx) => [idx, Array.from(set)]))
         })),
         redoStack: redoStack.map(entry => ({
           userGrid: entry.userGrid,
@@ -351,7 +363,7 @@ const Game = ({ puzzle, sol }) => {
           console.log('No players left, deleting session');
           await deleteSession(sessionId);
         }
-      }, 8000)
+      }, 30000)
 
 
     } catch (err) {
@@ -361,18 +373,18 @@ const Game = ({ puzzle, sol }) => {
 
 
   useEffect(() => {
-    const handleUnload = (e) => {
+    const handleBeforeUnload = (e) => {
       e.preventDefault();
       cleanupBeforeUnload();
     };
 
-    window.addEventListener('beforeunload', handleUnload);
+    window.addEventListener('beforeunload', handleBeforeUnload);
 
     return () => {
-      cleanupBeforeUnload();
-      window.removeEventListener('beforeunload', handleUnload);
+      window.removeEventListener('beforeunload', handleBeforeUnload);
     };
   }, [sessionId]);
+
 
 
 

@@ -2,8 +2,13 @@ import { doc, setDoc, getDoc, onSnapshot, updateDoc, arrayUnion, deleteDoc } fro
 import { db } from "./config"
 
 export const createSession = async (sessionId, initialState) => {
-  const sessionRef = doc(db, "sessions", sessionId)
-  await setDoc(sessionRef, { ...initialState, updatedAt: Date.now() })
+  try {
+    const sessionRef = doc(db, "sessions", sessionId)
+    await setDoc(sessionRef, { ...initialState, updatedAt: Date.now() })
+    console.log("Session created successfully:", sessionId)
+  } catch (error) {
+    console.error("Error creating session:", error)
+  }
 }
 
 export const subscribeToSession = (sessionId, onUpdate) => {
@@ -30,7 +35,7 @@ export const addPlayerToSession = async (sessionId, player) => {
   await updateDoc(sessionRef, {
     players: arrayUnion(player)
   })
-} 
+}
 
 export const deleteSession = async (sessionId) => {
   try {
