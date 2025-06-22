@@ -20,7 +20,7 @@ export const subscribeToSession = (sessionId, onUpdate) => {
 
 export const updateSession = async (sessionId, updates) => {
   const sessionRef = doc(db, "sessions", sessionId)
-  await updateDoc(sessionRef, { ...updates, updatedAt: Date.now() })
+  await updateDoc(sessionRef, updates)
 }
 
 export const getSessionData = async (sessionId) => {
