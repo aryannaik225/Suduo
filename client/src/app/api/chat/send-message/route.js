@@ -1,4 +1,5 @@
 import Pusher from 'pusher';
+import { NextResponse } from 'next/server';
 
 const pusher = new Pusher({
   appId: process.env.NEXT_PUBLIC_PUSHER_APP_ID,

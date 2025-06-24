@@ -7,6 +7,7 @@ import { useRouter } from 'next/navigation';
 import { v4 as uuidv4 } from 'uuid';
 import axios from 'axios';
 import { nanoid } from 'nanoid';
+import { createSession } from '@/firebase/firestoreUtils';
 
 const difficulties = ['Easy', 'Medium', 'Hard', 'Insane', 'Inhuman']
 
@@ -52,13 +53,15 @@ export default function Home() {
 
       const sessionId = nanoid()
       const hostId = nanoid(10)
+      const hostUsername = name
+      const hostPfp = `/profile_avatars/pfp${Math.floor(Math.random() * 16) + 1}.svg`;
 
       localStorage.setItem('hostData', JSON.stringify({
         sessionId,
         difficulty,
         hostId,
-        hostUsername: name,
-        hostPfp: `/profile_avatars/pfp${Math.floor(Math.random() * 16) + 1}.svg`,
+        hostUsername,
+        hostPfp,
       }));
 
       const res = await axios.get(`/api/generate-sudoku?difficulty=${difficulty}`);
@@ -66,12 +69,48 @@ export default function Home() {
       if (!puzzle || !solution) {
         throw new Error('Failed to generate puzzle');
       }
-      localStorage.setItem('puzzleData', JSON.stringify({
-        sessionId,
-        puzzle,
-        solution,
-        difficultyRating,
-      }));
+
+      const initialState = {
+        initialGrid: puzzle,
+        solution: solution,
+        userGrid: Array(81).fill(null),
+        notesGrid: Object.fromEntries(Array(81).fill(null).map((_, idx) => [idx, []])),
+        mistakes: 0,
+        pause: false,
+        undoStack: [],
+        redoStack: [],
+        players: [{
+          id: hostId,
+          username: hostUsername,
+          avatar: hostPfp,
+          joinedAt: Date.now()
+        }]
+      };
+
+      await createSession(sessionId, initialState);
+
+
+      if (!sessionId || !hostId) {
+        toast.error('Failed to create game session. Please try again.', {
+          position: 'top-center',
+          autoClose: 3000,
+          pauseOnHover: true,
+          theme: theme === 'dark' ? 'dark' : 'light'
+        });
+        return
+      }
+
+      if (!hostId || !hostUsername || !hostPfp) {
+        toast.error('Failed to create host data. Please try again.', {
+          position: 'top-center',
+          autoClose: 3000,
+          pauseOnHover: true,
+          theme: theme === 'dark' ? 'dark' : 'light'
+        });
+        return
+      }
+
+
 
       setLoading(false);
       setReady(true);
@@ -102,10 +141,10 @@ export default function Home() {
 
         <div className='flex flex-col gap-2 w-full'>
           <div className='bg-[#020817] px-3 py-3 rounded-lg border-2 focus-within:border-white border-[#324465] w-full mb-5'>
-            <input 
+            <input
               type="text"
               placeholder='Enter your username'
-              value={name} 
+              value={name}
               onChange={(e) => setName(e.target.value)}
               className='w-full h-full bg-transparent placeholder:text-slate-400 text-white text-[15px] focus:outline-none inter-regular'
             />
@@ -134,7 +173,7 @@ export default function Home() {
           {loading
             ? ready
               ? 'Game Ready'
-              : <><FaSpinner className='animate-spin mr-2'/> Creating Game</>
+              : <><FaSpinner className='animate-spin mr-2' /> Creating Game</>
             : 'Start Game'
           }
         </button>

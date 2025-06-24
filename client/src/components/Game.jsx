@@ -13,6 +13,8 @@ import { QRCodeCanvas } from 'qrcode.react'
 import ChatBox from './ChatBox'
 import { createSession, deleteSession, subscribeToSession, updateSession, getSessionData } from '@/firebase/firestoreUtils'
 import { useParams, useRouter } from 'next/navigation'
+import isEqual from 'lodash/isEqual';
+
 
 const Game = ({ puzzle, sol }) => {
 
@@ -20,8 +22,8 @@ const Game = ({ puzzle, sol }) => {
   const [pause, setPause] = useState(false)
   const [timeInSeconds, setTimeInSeconds] = useState(0)
   const [mistakes, setMistakes] = useState(0)
-  const initialGrid = puzzle.map((cell) => (cell === null ? null : cell))
-  const solution = sol.map((cell) => (cell === null ? null : cell))
+  const [initialGrid, setInitialGrid] = useState(Array(81).fill(null));
+  const [solution, setSolution] = useState(Array(81).fill(null));
   const [userGrid, setUserGrid] = useState(Array(81).fill(null))
   const [selectedCell, setSelectedCell] = useState(null)
   const [notesGrid, setNotesGrid] = useState(Array(81).fill(new Set()))
@@ -218,84 +220,80 @@ const Game = ({ puzzle, sol }) => {
 
   const multiplayerLink = typeof window !== 'undefined' ? `${window.location.origin}/game/${sessionId}/inputTaker` : ''
   const debounceRef = useRef(null)
-
-  useEffect(() => {
-    const initSession = async () => {
-      if (!sessionId) return
-
-      const hostData = localStorage.getItem('hostData')
-      if (!hostData) return
-      const { hostId, hostUsername, hostPfp } = JSON.parse(hostData)
-      if (!hostId || !hostUsername || !hostPfp) return
-
-      const existing = await getSessionData(sessionId)
-      if (existing) return
-
-      const initialState = {
-        initialGrid: initialGrid,
-        solution: solution,
-        userGrid: userGrid,
-        notesGrid: Object.fromEntries(
-          notesGrid.map((set, index) => [index, [...set]])
-        ),
-        mistakes: mistakes,
-        pause: pause,
-        undoStack: undoStack.map(entry => ({
-          userGrid: entry.userGrid,
-          notesGrid: Object.fromEntries(entry.notesGrid.map((set, idx) => [idx, Array.from(set)]))
-        })),
-        redoStack: redoStack.map(entry => ({
-          userGrid: entry.userGrid,
-          notesGrid: entry.notesGrid.map(set => Array.from(set))
-        })),
-        players: [{
-          id: hostId,
-          username: hostUsername,
-          avatar: hostPfp,
-          joinedAt: Date.now()
-        }]
-      }
-
-      console.log('Creating session with ID:', sessionId)
-      await createSession(sessionId, initialState)
-      console.log('Session creation attempted with ID:', sessionId)
-
-      setPlayersList(initialState.players)
-
-    }
-
-    initSession()
-  }, [sessionId])
+  const lastSessionSnapshot = useRef(null)
 
 
   useEffect(() => {
 
     if (!sessionId) return
 
-    const unsubscribe = subscribeToSession(sessionId, (data) => {
-      if (!data || data.lastUpdatedBy === playerId) return
+    // const unsubscribe = subscribeToSession(sessionId, (data) => {
+    //   if (!data || data.lastUpdatedBy === playerId) return
+    //   setInitialGrid(data.initialGrid);
+    //   setSolution(data.solution);
+    //   setUserGrid(data.userGrid)
+    //   setNotesGrid(
+    //     Array(81).fill().map((_, idx) => new Set(data.notesGrid?.[idx] || []))
+    //   )
+    //   setMistakes(data.mistakes)
+    //   setPause(data.pause)
+    //   setUndoStack(
+    //     (data.undoStack || []).map(entry => ({
+    //       userGrid: entry.userGrid,
+    //       notesGrid: Array(81).fill().map((_, idx) => new Set(entry.notesGrid?.[idx] || []))
+    //     }))
+    //   )
+    //   setRedoStack(
+    //     (data.redoStack || []).map(entry => ({
+    //       userGrid: entry.userGrid,
+    //       notesGrid: Array(81).fill().map((_, idx) => new Set(entry.notesGrid?.[idx] || []))
+    //     }))
+    //   )
+    //   setPlayersList(data.players || [])
 
-      setUserGrid(data.userGrid)
+    // })
+
+    const unsubscribe = subscribeToSession(sessionId, (data) => {
+      if (!data || data.lastUpdatedBy === playerId) return;
+
+      const prev = lastSessionSnapshot.current;
+
+      const hasGridChanged =
+        !isEqual(prev?.userGrid, data.userGrid) ||
+        !isEqual(prev?.notesGrid, data.notesGrid) ||
+        prev?.mistakes !== data.mistakes ||
+        prev?.pause !== data.pause;
+
+      if (!hasGridChanged) {
+        lastSessionSnapshot.current = data;
+        return;
+      }
+
+      lastSessionSnapshot.current = data;
+
+      setInitialGrid(data.initialGrid);
+      setSolution(data.solution);
+      setUserGrid(data.userGrid);
       setNotesGrid(
         Array(81).fill().map((_, idx) => new Set(data.notesGrid?.[idx] || []))
-      )
-      setMistakes(data.mistakes)
-      setPause(data.pause)
+      );
+      setMistakes(data.mistakes);
+      setPause(data.pause);
       setUndoStack(
         (data.undoStack || []).map(entry => ({
           userGrid: entry.userGrid,
           notesGrid: Array(81).fill().map((_, idx) => new Set(entry.notesGrid?.[idx] || []))
         }))
-      )
+      );
       setRedoStack(
         (data.redoStack || []).map(entry => ({
           userGrid: entry.userGrid,
           notesGrid: Array(81).fill().map((_, idx) => new Set(entry.notesGrid?.[idx] || []))
         }))
-      )
-      setPlayersList(data.players || [])
+      );
+      setPlayersList(data.players || []);
+    });
 
-    })
 
     return () => {
       unsubscribe()
@@ -311,17 +309,21 @@ const Game = ({ puzzle, sol }) => {
       updateSession(sessionId, {
         userGrid: userGrid,
         notesGrid: Object.fromEntries(
-          notesGrid.map((set, index) => [index, [...set]])
+          notesGrid.map((set, idx) => [idx, Array.from(set)])
         ),
         mistakes: mistakes,
         pause: pause,
         undoStack: undoStack.map(entry => ({
           userGrid: entry.userGrid,
-          notesGrid: Object.fromEntries(entry.notesGrid.map((set, idx) => [idx, Array.from(set)]))
+          notesGrid: Object.fromEntries(
+            entry.notesGrid.map((set, idx) => [idx, Array.from(set)])
+          )
         })),
         redoStack: redoStack.map(entry => ({
           userGrid: entry.userGrid,
-          notesGrid: entry.notesGrid.map(set => Array.from(set))
+          notesGrid: Object.fromEntries(
+            entry.notesGrid.map((set, idx) => [idx, Array.from(set)])
+          )
         })),
         lastUpdatedBy: playerId,
       })
