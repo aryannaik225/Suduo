@@ -110,9 +110,6 @@ export default function Home() {
         return
       }
 
-
-
-      setLoading(false);
       setReady(true);
 
       setTimeout(() => {

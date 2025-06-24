@@ -14,6 +14,7 @@ import ChatBox from './ChatBox'
 import { createSession, deleteSession, subscribeToSession, updateSession, getSessionData } from '@/firebase/firestoreUtils'
 import { useParams, useRouter } from 'next/navigation'
 import isEqual from 'lodash/isEqual';
+import { toast } from 'react-toastify'
 
 
 const Game = ({ puzzle, sol }) => {
@@ -221,37 +222,12 @@ const Game = ({ puzzle, sol }) => {
   const multiplayerLink = typeof window !== 'undefined' ? `${window.location.origin}/game/${sessionId}/inputTaker` : ''
   const debounceRef = useRef(null)
   const lastSessionSnapshot = useRef(null)
+  const prevPlayersRef = useRef([])
 
 
   useEffect(() => {
 
     if (!sessionId) return
-
-    // const unsubscribe = subscribeToSession(sessionId, (data) => {
-    //   if (!data || data.lastUpdatedBy === playerId) return
-    //   setInitialGrid(data.initialGrid);
-    //   setSolution(data.solution);
-    //   setUserGrid(data.userGrid)
-    //   setNotesGrid(
-    //     Array(81).fill().map((_, idx) => new Set(data.notesGrid?.[idx] || []))
-    //   )
-    //   setMistakes(data.mistakes)
-    //   setPause(data.pause)
-    //   setUndoStack(
-    //     (data.undoStack || []).map(entry => ({
-    //       userGrid: entry.userGrid,
-    //       notesGrid: Array(81).fill().map((_, idx) => new Set(entry.notesGrid?.[idx] || []))
-    //     }))
-    //   )
-    //   setRedoStack(
-    //     (data.redoStack || []).map(entry => ({
-    //       userGrid: entry.userGrid,
-    //       notesGrid: Array(81).fill().map((_, idx) => new Set(entry.notesGrid?.[idx] || []))
-    //     }))
-    //   )
-    //   setPlayersList(data.players || [])
-
-    // })
 
     const unsubscribe = subscribeToSession(sessionId, (data) => {
       if (!data || data.lastUpdatedBy === playerId) return;
@@ -263,6 +239,39 @@ const Game = ({ puzzle, sol }) => {
         !isEqual(prev?.notesGrid, data.notesGrid) ||
         prev?.mistakes !== data.mistakes ||
         prev?.pause !== data.pause;
+
+      const currentPlayers = data.players || []
+      const previousPlayers = prevPlayersRef.current || []
+
+      const previousIds = new Set(previousPlayers.map(p => p.id));
+      const currentIds = new Set(currentPlayers.map(p => p.id));
+
+      const newPlayers = currentPlayers.filter(p => !previousIds.has(p.id));
+
+      newPlayers.forEach(p => {
+        if (p.id !== playerId) {
+          toast(`${p.username} joined the game! 🎉`, {
+            position: 'bottom-right',
+            autoClose: 3000,
+            pauseOnHover: true,
+            theme: 'dark',
+            style: {
+              backgroundColor: '#1b2131',
+              color: '#ffffff',
+              borderRadius: '8px',
+              padding: '10px 15px',
+              fontSize: '16px',
+              fontFamily: 'Inter, sans-serif'
+            },
+            progressStyle: {
+              backgroundColor: '#4ade80'
+            }
+          });
+        }
+      });
+
+      prevPlayersRef.current = currentPlayers
+      setPlayersList(currentPlayers)
 
       if (!hasGridChanged) {
         lastSessionSnapshot.current = data;
