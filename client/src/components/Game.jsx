@@ -343,52 +343,20 @@ const Game = ({ puzzle, sol }) => {
 
   // ---------------- Players Leave Logic ---------------
 
-  const cleanupBeforeUnload = async () => {
-    if (!sessionId) return;
-
+  const cleanupBeforeUnload = () => {
     const playerData = localStorage.getItem('playerData');
     const hostData = localStorage.getItem('hostData');
+    const leavingPlayerId = playerData ? JSON.parse(playerData).playerId : hostData ? JSON.parse(hostData).hostId : null;
 
-    let leavingPlayerId = null;
+    if (!leavingPlayerId || !sessionId) return;
 
-    if (playerData) {
-      const { playerId } = JSON.parse(playerData);
-      leavingPlayerId = playerId;
-    } else if (hostData) {
-      const { hostId } = JSON.parse(hostData);
-      leavingPlayerId = hostId;
-    } else {
-      return;
-    }
+    const blob = new Blob (
+      [JSON.stringify({ sessionId, playerId: leavingPlayerId })],
+      { type: 'application/json' }
+    )
 
-    try {
-      const session = await getSessionData(sessionId);
-      if (!session?.players) return;
-
-      const updatedPlayers = session.players.filter(p => p.id !== leavingPlayerId);
-
-      await updateSession(sessionId, { players: updatedPlayers });
-
-      if (playerData) {
-        localStorage.removeItem('playerData');
-      } else if (hostData) {
-        localStorage.removeItem('hostData');
-      }
-
-      setTimeout(async () => {
-        const lastest = await getSessionData(sessionId);
-        if (lastest?.players?.length === 0) {
-          console.log('No players left, deleting session');
-          await deleteSession(sessionId);
-        }
-      }, 30000)
-
-
-    } catch (err) {
-      console.error('Error during cleanup:', err);
-    }
-  };
-
+    navigator.sendBeacon('/api/leave-session/route', blob);
+  }
 
   useEffect(() => {
     const handleBeforeUnload = (e) => {

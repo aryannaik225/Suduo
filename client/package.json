@@ -13,6 +13,7 @@
     "axios": "^1.10.0",
     "copy-to-clipboard": "^3.3.3",
     "firebase": "^11.9.1",
+    "firebase-admin": "^13.4.0",
     "framer-motion": "^12.18.1",
     "ldrs": "^1.1.7",
     "lodash": "^4.17.21",
