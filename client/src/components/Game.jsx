@@ -355,7 +355,7 @@ const Game = ({ puzzle, sol }) => {
       { type: 'application/json' }
     )
 
-    navigator.sendBeacon('/api/leave-session/route', blob);
+    navigator.sendBeacon('/api/leave-session', blob);
   }
 
   useEffect(() => {
