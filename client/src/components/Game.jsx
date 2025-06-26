@@ -33,6 +33,13 @@ const Game = ({ puzzle, sol }) => {
   const [redoStack, setRedoStack] = useState([]);
   const [penMode, setPenMode] = useState(false)
   const router = useRouter()
+  const [showTimer, setShowTimer] = useState(true)
+  const [showSettings, setShowSettings] = useState(false)
+
+  const toggle = () => {
+    setShowTimer(!showTimer);
+  };
+
 
   // ---------------- Player Logic ---------------
 
@@ -350,7 +357,7 @@ const Game = ({ puzzle, sol }) => {
 
     if (!leavingPlayerId || !sessionId) return;
 
-    const blob = new Blob (
+    const blob = new Blob(
       [JSON.stringify({ sessionId, playerId: leavingPlayerId })],
       { type: 'application/json' }
     )
@@ -387,15 +394,32 @@ const Game = ({ puzzle, sol }) => {
               className={`text-slate-400 text-2xl cursor-pointer hover:scale-110 duration-200 ${pause ? 'hidden' : 'block'}`}
               onClick={() => setPause(!pause)}
             />
-            <span className='text-slate-400 inter-semibold text-base'>{formatTime(timeInSeconds)}</span>
+            <span className={`${showTimer ? 'opacity-100' : 'opacity-0'} text-slate-400 inter-semibold text-base`}>{formatTime(timeInSeconds)}</span>
           </div>
 
           <div className='text-slate-400 inter-medium text-base w-[110px] flex justify-center items-center'>
             Mistakes: <span className={`font-bold ${mistakes >= 3 ? 'text-red-500' : 'dark:text-white text-black'}`}>{mistakes}/3</span>
           </div>
 
-          <div className='text-slate-400 w-[110px] flex justify-end items-center'>
-            <IoSettingsOutline className='text-2xl cursor-pointer hover:rotate-[110deg] duration-300' />
+          <div className='relative text-slate-400 w-[110px] flex justify-end items-center'>
+            <IoSettingsOutline className='z-10 text-2xl cursor-pointer hover:rotate-[110deg] duration-300'
+              onClick={() => setShowSettings(!showSettings)}
+            />
+            <div className={`${showSettings ? 'block' : 'hidden'} flex flex-col items-center justify-end z-0 absolute top-[-10px] right-[-10px] bg-slate-800 border-gray-700 text-base text-white rounded px-2 py-1 inter-semibold min-h-21 min-w-[200px]`}>
+              <div className='flex gap-4 items-center justify-between mb-2'>
+                <span>Show Timer</span>
+                <button
+                  onClick={toggle}
+                  className={`w-12 h-6 flex items-center rounded-full p-1 duration-300 ease-in-out
+          ${showTimer ? "bg-green-800" : "bg-gray-400"}`}
+                >
+                  <div
+                    className={`bg-white w-4 h-4 rounded-full shadow-md transform duration-300 ease-in-out
+            ${showTimer ? "translate-x-6" : "translate-x-0"}`}
+                  />
+                </button>
+              </div>
+            </div>
           </div>
         </div>
 
