@@ -3,11 +3,13 @@
 import React, { useState, useEffect } from 'react';
 import { ToastContainer } from 'react-toastify';
 import { FaSpinner } from 'react-icons/fa';
+import { SiTicktick } from "react-icons/si";
 import { useRouter } from 'next/navigation';
 import { v4 as uuidv4 } from 'uuid';
 import axios from 'axios';
 import { nanoid } from 'nanoid';
 import { createSession } from '@/firebase/firestoreUtils';
+import Footer from '@/components/Footer';
 
 const difficulties = ['Easy', 'Medium', 'Hard', 'Insane', 'Inhuman']
 
@@ -130,8 +132,11 @@ export default function Home() {
 
 
   return (
-    <div className='w-screen h-screen flex justify-center items-center'>
-      <div className='flex flex-col items-center min-h-10 w-80'>
+    <div className='relative w-screen h-screen overflow-hidden flex justify-center items-center'>
+
+      <div className="absolute inset-0 z-0 opacity-20 bg-[url('/sudoku-bg.svg')] bg-center bg-cover blur-sm"></div>
+
+      <div className='relative z-10 flex flex-col items-center min-h-10 w-80'>
         <div className='text-3xl poppins-semibold text-white mb-5'>
           Select Difficulty
         </div>
@@ -169,14 +174,16 @@ export default function Home() {
         >
           {loading
             ? ready
-              ? 'Game Ready'
+              ? <><SiTicktick className='mr-2'/>Game Ready</>
               : <><FaSpinner className='animate-spin mr-2' /> Creating Game</>
             : 'Start Game'
           }
         </button>
 
         <ToastContainer />
+
       </div>
+      <Footer />
     </div>
   );
 }
