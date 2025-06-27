@@ -463,59 +463,68 @@ const Game = ({ puzzle, sol }) => {
           </div>
 
           <div className='max-w-[65%] max-h-full'>
-            <div className='grid grid-cols-9 w-full h-full aspect-square gap-0'>
-              {initialGrid.map((cell, idx) => {
-                const rowIndex = Math.floor(idx / 9)
-                const colIndex = idx % 9
-                const isThickTop = rowIndex % 3 === 0
-                const isThickLeft = colIndex % 3 === 0
-                const isThickBottom = rowIndex === 8
-                const isThickRight = colIndex === 8
+            <div className='relative h-full w-full'>
+              {pause && (
+                <div className='absolute inset-0 z-20 bg-black/70 flex items-center justify-center rounded-xl'>
+                  <FaRegCirclePlay className='text-8xl text-slate-400 ' />
+                </div>
+              )}
+              
 
-                const cellValue = cell ?? userGrid[idx]
-                const isEditable = cell === null
+              <div className={`grid grid-cols-9 w-full h-full aspect-square gap-0 transition-opacity duration-300 ${pause ? 'opacity-0' : 'opacity-100'}`}>
+                {initialGrid.map((cell, idx) => {
+                  const rowIndex = Math.floor(idx / 9)
+                  const colIndex = idx % 9
+                  const isThickTop = rowIndex % 3 === 0
+                  const isThickLeft = colIndex % 3 === 0
+                  const isThickBottom = rowIndex === 8
+                  const isThickRight = colIndex === 8
 
-                const isSelected = selectedCell === idx
+                  const cellValue = cell ?? userGrid[idx]
+                  const isEditable = cell === null
 
-                let bgColor = ''
-                if (!isEditable) {
-                  bgColor = 'bg-[#060e22] font-bold';
-                } else if (isCellWrong(idx)) {
-                  bgColor = 'bg-red-400 caret-white';
-                } else if (isSelected) {
-                  bgColor = 'bg-[#1b2131]';
-                } else {
-                  bgColor = 'bg-[#020817] caret-transparent';
-                }
+                  const isSelected = selectedCell === idx
 
-                return (
-                  <div
-                    key={idx}
-                    className={`flex items-center justify-center aspect-square w-full h-full text-center text-lg border border-[#2e3e5a] dark:border-[#25334d] dark:text-white focus:outline-none cursor-default
+                  let bgColor = ''
+                  if (!isEditable) {
+                    bgColor = 'bg-[#060e22] font-bold';
+                  } else if (isCellWrong(idx)) {
+                    bgColor = 'bg-red-400 caret-white';
+                  } else if (isSelected) {
+                    bgColor = 'bg-[#1b2131]';
+                  } else {
+                    bgColor = 'bg-[#020817] caret-transparent';
+                  }
+
+                  return (
+                    <div
+                      key={idx}
+                      className={`flex items-center justify-center aspect-square w-full h-full text-center text-lg border border-[#2e3e5a] dark:border-[#25334d] dark:text-white focus:outline-none cursor-default
                       ${isThickTop ? 'border-t-[3px] dark:border-t-[#3e434c]' : ''}
                       ${isThickLeft ? 'border-l-[3px] dark:border-l-[#3e434c]' : ''}
                       ${isThickBottom ? 'border-b-[3px] dark:border-b-[#3e434c]' : ''}
                       ${isThickRight ? 'border-r-[3px] dark:border-r-[#3e434c]' : ''}
                       ${bgColor}`}
-                    onClick={() => {
-                      if (!isEditable) return
-                      setSelectedCell(selectedCell === idx ? null : idx)
-                    }}
-                  >
-                    {cellValue ? (
-                      <span className="text-xl">{cellValue}</span>
-                    ) : (
-                      <div className="flex flex-wrap justify-center text-[10px] leading-3 text-gray-400 min-h-[36px] w-full">
-                        {[1, 2, 3, 4, 5, 6, 7, 8, 9].map(n => (
-                          <span key={n} className={`w-1/3 text-center ${notesGrid[idx]?.has(n) ? '' : 'opacity-0'}`}>
-                            {n}
-                          </span>
-                        ))}
-                      </div>
-                    )}
-                  </div>
-                )
-              })}
+                      onClick={() => {
+                        if (!isEditable) return
+                        setSelectedCell(selectedCell === idx ? null : idx)
+                      }}
+                    >
+                      {cellValue ? (
+                        <span className="text-xl">{cellValue}</span>
+                      ) : (
+                        <div className="flex flex-wrap justify-center text-[10px] leading-3 text-gray-400 min-h-[36px] w-full">
+                          {[1, 2, 3, 4, 5, 6, 7, 8, 9].map(n => (
+                            <span key={n} className={`w-1/3 text-center ${notesGrid[idx]?.has(n) ? '' : 'opacity-0'}`}>
+                              {n}
+                            </span>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  )
+                })}
+              </div>
             </div>
           </div>
 
