@@ -14,6 +14,7 @@ export default function Home() {
   const [name, setName] = useState('')
   const { sessionId } = useParams()
   const [loading, setLoading] = useState(false)
+  const [ready, setReady] = useState(false)
 
   const router = useRouter()
 
@@ -120,6 +121,7 @@ export default function Home() {
       }));
 
       setLoading(false)
+      setReady(true)
 
       setTimeout(() => {
         router.push(`/game/${sessionId}`)
@@ -143,30 +145,40 @@ export default function Home() {
 
 
   return (
-    <div className="w-screen h-screen flex justify-center items-center">
+    <div className="relative w-screen h-screen flex justify-center items-center bg-gradient-to-br from-[#0f172a] via-[#0a0f1f] to-[#0f172a] overflow-hidden">
       <ToastContainer />
-      <div className="flex flex-col items-center min-h-10 w-80">
-        <div className="text-3xl poppins-semibold text-white mb-5">
+
+      {/* Glowing blobs in the background */}
+      <div className="absolute w-full h-full pointer-events-none z-0">
+        <div className="absolute top-1/4 left-1/4 w-40 h-40 bg-cyan-400 opacity-10 blur-3xl rounded-full animate-pulse"></div>
+        <div className="absolute top-[60%] right-[20%] w-52 h-52 bg-purple-500 opacity-10 blur-2xl rounded-full animate-ping"></div>
+      </div>
+
+      {/* Centered container with glassmorphism and glowing box shadow */}
+      <div className="relative z-10 flex flex-col items-center min-h-10 w-80 backdrop-blur-md bg-white/7 border border-white/10 p-8 rounded-2xl shadow-[0_0_30px_rgba(0,255,255,0.1)]">
+        <div className="text-2xl font-semibold text-white mb-8 text-center">
           Enter Your Username
         </div>
 
-        <div className='bg-[#020817] px-3 py-3 rounded-lg border-2 focus-within:border-white border-[#324465] w-full mb-5'>
+        <div className="w-full px-4 py-3 mb-5 rounded-md border border-cyan-400/30 bg-transparent focus-within:ring-2 focus-within:ring-cyan-400/30">
           <input
             type="text"
-            placeholder='Enter your username'
+            placeholder="Enter your username"
             value={name}
             onChange={(e) => setName(e.target.value)}
-            className='w-full h-full bg-transparent placeholder:text-slate-400 text-white text-[15px] focus:outline-none inter-regular'
+            className="w-full bg-transparent placeholder:text-slate-400 text-white text-[15px] focus:outline-none"
           />
         </div>
 
         <button
           onClick={handleStartGame}
-          className="mt-5 w-full py-3 bg-gray-800 text-white rouned-lg text-[15px] inter-regular hover:bg-gray-700 duration-200 transition flex justify-center items-center"
+          className="mt-2 w-full py-3 bg-cyan-500/10 border border-cyan-400 text-cyan-200 rounded-md hover:bg-cyan-500/20 transition-all duration-200 shadow-[0_0_20px_rgba(0,255,255,0.15)] flex justify-center items-center"
           disabled={!name || loading}
         >
           {loading
-            ? <><FaSpinner className="animate-spin mr-2" /> Creating Game</>
+            ? ready
+              ? <><SiTicktick className='mr-2' />Game Ready</>
+              : <><FaSpinner className='animate-spin mr-2' /> Creating Game</>
             : 'Start Game'
           }
         </button>

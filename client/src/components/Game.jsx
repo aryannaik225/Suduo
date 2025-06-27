@@ -383,7 +383,7 @@ const Game = ({ puzzle, sol }) => {
 
   return (
     <div className='flex justify-center mb-10'>
-      <div className='max-h-[800px] w-[80%] max-w-[1228px] rounded-2xl border-[3px] border-[#324465] flex flex-col items-center p-5'>
+      <div className='max-h-[800px] w-[80%] max-w-[1228px] rounded-2xl border-[3px] border-[#324465] flex flex-col items-center p-5 shadow-[0_0_30px_rgba(0,255,255,0.2)]'>
         <div className='flex items-center justify-between w-full mb-3'>
           <div className='flex gap-2 items-center text-lg w-[110px] justify-start'>
             <FaRegCirclePlay

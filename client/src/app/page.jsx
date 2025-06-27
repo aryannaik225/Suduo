@@ -10,6 +10,7 @@ import axios from 'axios';
 import { nanoid } from 'nanoid';
 import { createSession } from '@/firebase/firestoreUtils';
 import Footer from '@/components/Footer';
+import NavBar from '@/components/NavBar';
 
 const difficulties = ['Easy', 'Medium', 'Hard', 'Insane', 'Inhuman']
 
@@ -134,21 +135,24 @@ export default function Home() {
   return (
     <div className='relative w-screen h-screen overflow-hidden flex justify-center items-center'>
 
-      <div className="absolute inset-0 z-0 opacity-20 bg-[url('/sudoku-bg.svg')] bg-center bg-cover blur-sm"></div>
+      <div className="absolute inset-0 z-0 opacity-20 bg-[url('/sudoku-bg-dark.svg')] dark:bg-[url('/sudoku-bg.svg')] bg-center bg-cover blur-sm"></div>
+
+      <NavBar theme={theme} setTheme={setTheme}/>
 
       <div className='relative z-10 flex flex-col items-center min-h-10 w-80'>
-        <div className='text-3xl poppins-semibold text-white mb-5'>
+
+        <div className='text-3xl poppins-semibold text-black dark:text-white mb-5'>
           Select Difficulty
         </div>
 
         <div className='flex flex-col gap-2 w-full'>
-          <div className='bg-[#020817] px-3 py-3 rounded-lg border-2 focus-within:border-white border-[#324465] w-full mb-5'>
+          <div className='bg-white dark:bg-[#020817] px-3 py-3 rounded-lg border-2 border-gray-300 dark:border-[#324465] focus-within:border-black dark:focus-within:border-white w-full mb-5'>
             <input
               type="text"
               placeholder='Enter your username'
               value={name}
               onChange={(e) => setName(e.target.value)}
-              className='w-full h-full bg-transparent placeholder:text-slate-400 text-white text-[15px] focus:outline-none inter-regular'
+              className='w-full h-full bg-transparent placeholder:text-gray-500 dark:placeholder:text-slate-400 text-black dark:text-white text-[15px] focus:outline-none inter-regular'
             />
           </div>
         </div>
@@ -159,7 +163,12 @@ export default function Home() {
               <button
                 key={level}
                 onClick={() => setDifficulty(level)}
-                className={`w-full py-3 ${difficulty === level ? ' bg-gray-700' : 'bg-slate-300 dark:bg-[#020817] dark:text-gray-500 text-black'}  hover:bg-skate-400 dark:hover:bg-[#101929] rounded-lg text-[15px] inter-regular  duration-200 dark:hover:text-white transition`}
+                className={`w-full py-3
+              ${difficulty === level
+                    ? 'bg-gray-300 dark:bg-gray-700 text-black dark:text-white'
+                    : 'bg-slate-200 dark:bg-[#020817] text-black dark:text-gray-500'}
+              hover:bg-slate-300 dark:hover:bg-[#101929] hover:text-black dark:hover:text-white
+              rounded-lg text-[15px] inter-regular duration-200 transition`}
               >
                 {level}
               </button>
@@ -168,13 +177,13 @@ export default function Home() {
         </div>
 
         <button
-          className='mt-5 w-full py-3 bg-gray-800 text-white rounded-lg text-[15px] inter-regular hover:bg-gray-700 duration-200 transition flex justify-center items-center'
+          className='mt-5 w-full py-3 bg-black dark:bg-gray-800 text-white rounded-lg text-[15px] inter-regular hover:bg-gray-900 dark:hover:bg-gray-700 duration-200 transition flex justify-center items-center'
           onClick={handleStartGame}
           disabled={loading}
         >
           {loading
             ? ready
-              ? <><SiTicktick className='mr-2'/>Game Ready</>
+              ? <><SiTicktick className='mr-2' />Game Ready</>
               : <><FaSpinner className='animate-spin mr-2' /> Creating Game</>
             : 'Start Game'
           }
@@ -185,5 +194,6 @@ export default function Home() {
       </div>
       <Footer />
     </div>
+
   );
 }
