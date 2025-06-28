@@ -15,6 +15,7 @@ import { createSession, deleteSession, subscribeToSession, updateSession, getSes
 import { useParams, useRouter } from 'next/navigation'
 import isEqual from 'lodash/isEqual';
 import { toast } from 'react-toastify'
+import DecryptedText from './ui/DecryptedText'
 
 
 const Game = ({ puzzle, sol }) => {
@@ -23,6 +24,7 @@ const Game = ({ puzzle, sol }) => {
   const [pause, setPause] = useState(false)
   const [timeInSeconds, setTimeInSeconds] = useState(0)
   const [mistakes, setMistakes] = useState(0)
+  const [failed, setFailed] = useState(false)
   const [initialGrid, setInitialGrid] = useState(Array(81).fill(null));
   const [solution, setSolution] = useState(Array(81).fill(null));
   const [userGrid, setUserGrid] = useState(Array(81).fill(null))
@@ -39,6 +41,21 @@ const Game = ({ puzzle, sol }) => {
   const toggle = () => {
     setShowTimer(!showTimer);
   };
+
+  useEffect(() => {
+    if (!sessionId) return
+
+    if (mistakes === 3) {
+      setFailed(true)
+      setPause(true)
+    }
+  }, [mistakes])
+
+  const handleSecondChange = () => {
+    setMistakes(0)
+    setFailed(false)
+    setPause(false)
+  }
 
 
   // ---------------- Player Logic ---------------
@@ -149,7 +166,7 @@ const Game = ({ puzzle, sol }) => {
 
   useEffect(() => {
     const handleKeyDown = (e) => {
-      if (selectedCell === null) return;
+      if (pause || selectedCell === null) return;
 
       const row = Math.floor(selectedCell / 9);
       const col = selectedCell % 9;
@@ -295,6 +312,7 @@ const Game = ({ puzzle, sol }) => {
       );
       setMistakes(data.mistakes);
       setPause(data.pause);
+      setFailed(data.failed)
       setUndoStack(
         (data.undoStack || []).map(entry => ({
           userGrid: entry.userGrid,
@@ -329,6 +347,7 @@ const Game = ({ puzzle, sol }) => {
         ),
         mistakes: mistakes,
         pause: pause,
+        failed: failed,
         undoStack: undoStack.map(entry => ({
           userGrid: entry.userGrid,
           notesGrid: Object.fromEntries(
@@ -346,7 +365,6 @@ const Game = ({ puzzle, sol }) => {
     }, 500)
 
   }, [userGrid, notesGrid, mistakes, pause, undoStack, redoStack, sessionId])
-
 
   // ---------------- Players Leave Logic ---------------
 
@@ -387,12 +405,18 @@ const Game = ({ puzzle, sol }) => {
         <div className='flex items-center justify-between w-full mb-3'>
           <div className='flex gap-2 items-center text-lg w-[110px] justify-start'>
             <FaRegCirclePlay
-              className={`text-slate-500 dark:text-slate-400 text-2xl cursor-pointer hover:scale-110 duration-200 ${pause ? 'block' : 'hidden'}`}
-              onClick={() => setPause(!pause)}
+              className={`text-slate-500 dark:text-slate-400 text-2xl ${failed ? 'cursor-not-allowed pointer-events-none' : 'cursor-pointer hover:scale-110'} duration-200 ${pause ? 'block' : 'hidden'}`}
+              onClick={() => {
+                if (failed) return
+                setPause(!pause)
+              }}
             />
             <FaRegCirclePause
               className={`text-slate-500 dark:text-slate-400 text-2xl cursor-pointer hover:scale-110 duration-200 ${pause ? 'hidden' : 'block'}`}
-              onClick={() => setPause(!pause)}
+              onClick={() => {
+                if (failed) return
+                setPause(!pause)
+              }}
             />
             <span className={`${showTimer ? 'opacity-100' : 'opacity-0'} text-slate-500 dark:text-slate-400 inter-semibold text-base`}>{formatTime(timeInSeconds)}</span>
           </div>
@@ -464,12 +488,45 @@ const Game = ({ puzzle, sol }) => {
 
           <div className='max-w-[65%] max-h-full'>
             <div className='relative h-full w-full'>
-              {pause && (
+              {pause && !failed && (
                 <div className='absolute inset-0 z-20 bg-black/70 flex items-center justify-center rounded-xl'>
                   <FaRegCirclePlay className='text-8xl text-slate-500 dark:text-slate-400 ' />
                 </div>
               )}
-              
+
+              {failed && (
+                <div className='absolute inset-0 z-20 bg-[#31425d] flex flex-col items-center justify-center'>
+                  <DecryptedText
+                    text="Game Over!"
+                    speed={100}
+                    maxIterations={100}
+                    animateOn='view'
+                    revealDirection='start'
+                    sequential={true}
+                    className='text-4xl text-white inter-semibold mb-2'
+                  />
+
+                  <div className='relative flex mt-5 mb-5' onClick={handleSecondChange}>
+                    <div className='absolute inset-0 flex items-center justify-center z-0'>
+                      <motion.div
+                        animate={{ scale: [1, 1.5, 1] }}
+                        transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
+                        className='h-full w-[80%] rounded-lg bg-white opacity-10 duration-200'
+                      ></motion.div>
+                    </div>
+
+                    <div className='relative flex items-center justify-center py-[10px] px-3 bg-white rounded-md text-[#31425d] inter-medium cursor-pointer hover:bg-gray-300 z-10'>
+                      Second Chance
+                    </div>
+                  </div>
+
+                  <div className='text-white inter-medium text-base mt-2 hover:underline cursor-pointer transition'>
+                    New Game
+                  </div>
+
+                </div>
+              )}
+
 
               <div className={`grid grid-cols-9 w-full h-full aspect-square gap-0 transition-opacity duration-300 ${pause ? 'opacity-0' : 'opacity-100'}`}>
                 {initialGrid.map((cell, idx) => {
@@ -500,11 +557,11 @@ const Game = ({ puzzle, sol }) => {
                     <div
                       key={idx}
                       className={`flex items-center justify-center aspect-square w-full h-full text-center text-lg border border-[#a0b1c8] dark:border-[#25334d] dark:text-white focus:outline-none cursor-default
-                      ${isThickTop ? 'border-t-[3px] dark:border-t-[#3e434c] border-t-[#a0b1c8] ' : ''}
-                      ${isThickLeft ? 'border-l-[3px] dark:border-l-[#3e434c] border-l-[#a0b1c8]' : ''}
-                      ${isThickBottom ? 'border-b-[3px] dark:border-b-[#3e434c] border-b-[#a0b1c8] ' : ''}
-                      ${isThickRight ? 'border-r-[3px] dark:border-r-[#3e434c] border-r-[#a0b1c8] ' : ''}
-                      ${bgColor}`}
+                        ${isThickTop ? 'border-t-[3px] dark:border-t-[#3e434c] border-t-[#a0b1c8] ' : ''}
+                        ${isThickLeft ? 'border-l-[3px] dark:border-l-[#3e434c] border-l-[#a0b1c8]' : ''}
+                        ${isThickBottom ? 'border-b-[3px] dark:border-b-[#3e434c] border-b-[#a0b1c8] ' : ''}
+                        ${isThickRight ? 'border-r-[3px] dark:border-r-[#3e434c] border-r-[#a0b1c8] ' : ''}
+                        ${bgColor}`}
                       onClick={() => {
                         if (!isEditable) return
                         setSelectedCell(selectedCell === idx ? null : idx)
@@ -536,9 +593,9 @@ const Game = ({ puzzle, sol }) => {
               {[...Array(9)].map((_, i) => (
                 <button
                   key={i + 1}
-                  className='w-full aspect-square py-3 bg-slate-300 dark:bg-[#152237] dark:text-gray-500 text-black rounded text-xl font-semibold hover:bg-slate-400 dark:hover:bg-[#101929] duration-200 dark:hover:text-white transition'
+                  className={`w-full aspect-square py-3 bg-slate-300 dark:bg-[#152237] dark:text-gray-500 text-black rounded text-xl font-semibold ${pause ? '' : 'hover:bg-slate-400 dark:hover:bg-[#101929] duration-200 dark:hover:text-white transition'}`}
                   onClick={() => {
-                    if (selectedCell === null) return
+                    if (pause || selectedCell === null) return
 
                     saveState();
 
@@ -572,9 +629,9 @@ const Game = ({ puzzle, sol }) => {
                 </button>
               ))}
               <button
-                className='w-full py-3 bg-slate-300 dark:bg-[#152237] dark:text-gray-500 text-black rounded text-xl font-semibold hover:bg-slate-400 dark:hover:bg-[#101929] duration-200 dark:hover:text-white transition flex items-center justify-center'
+                className={`w-full py-3 bg-slate-300 dark:bg-[#152237] dark:text-gray-500 text-black rounded text-xl font-semibold ${pause ? '' : 'hover:bg-slate-400 dark:hover:bg-[#101929] duration-200 dark:hover:text-white transition'} flex items-center justify-center`}
                 onClick={() => {
-                  if (selectedCell === null) return
+                  if (pause || selectedCell === null) return
 
                   saveState();
 
@@ -607,7 +664,7 @@ const Game = ({ puzzle, sol }) => {
               setUserGrid(prevState.userGrid);
               setNotesGrid(prevState.notesGrid);
             }}
-            className='flex w-16 aspect-square items-center justify-center rounded-xl text-2xl bg-[#f1f5f9] dark:bg-transparent border-2 border-[#324465] hover:border-[#152237] dark:text-gray-500 text-black hover:bg-slate-300 dark:hover:bg-[#152237] duration-200 dark:hover:text-white transition'
+            className={`flex w-16 aspect-square items-center justify-center rounded-xl text-2xl bg-[#f1f5f9] dark:bg-transparent border-2 border-[#324465] dark:text-gray-500 text-black ${pause ? '' : 'hover:border-[#152237] hover:bg-slate-300 dark:hover:bg-[#152237] duration-200 dark:hover:text-white transition'}`}
           >
             <RiArrowGoBackLine />
           </button>
@@ -623,7 +680,7 @@ const Game = ({ puzzle, sol }) => {
               setUserGrid(nextState.userGrid);
               setNotesGrid(nextState.notesGrid);
             }}
-            className='flex w-16 aspect-square items-center justify-center rounded-xl text-2xl bg-[#f1f5f9] dark:bg-transparent border-2 border-[#324465] dark:hover:border-[#152237] dark:text-gray-500 text-black hover:bg-slate-300 dark:hover:bg-[#152237] duration-200 dark:hover:text-white transition'
+            className={`flex w-16 aspect-square items-center justify-center rounded-xl text-2xl bg-[#f1f5f9] dark:bg-transparent border-2 border-[#324465] dark:text-gray-500 text-black ${pause ? '' : 'hover:border-[#152237] hover:bg-slate-300 dark:hover:bg-[#152237] duration-200 dark:hover:text-white transition'}`}
           >
             <RiArrowGoForwardLine />
           </button>

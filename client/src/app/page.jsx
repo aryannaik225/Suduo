@@ -79,6 +79,7 @@ export default function Home() {
         notesGrid: Object.fromEntries(Array(81).fill(null).map((_, idx) => [idx, []])),
         mistakes: 0,
         pause: false,
+        failed: false,
         undoStack: [],
         redoStack: [],
         players: [{
