@@ -382,56 +382,56 @@ const Game = ({ puzzle, sol }) => {
 
 
   return (
-    <div className='flex justify-center mb-10'>
-      <div className='max-h-[800px] w-[80%] max-w-[1228px] rounded-2xl border-[3px] border-[#324465] flex flex-col items-center p-5 shadow-[0_0_30px_rgba(0,255,255,0.2)]'>
+    <div className='flex justify-center mb-5 h-auto'>
+      <div className='max-h-[800px] w-[80%] max-w-[1228px] rounded-2xl border-[3px] border-[#e0e5ee] dark:border-[#324465] flex flex-col items-center p-5 shadow-[0_0_30px_rgba(127,205,255,0.6)] dark:shadow-[0_0_30px_rgba(0,255,255,0.2)] bg-white dark:bg-transparent'>
         <div className='flex items-center justify-between w-full mb-3'>
           <div className='flex gap-2 items-center text-lg w-[110px] justify-start'>
             <FaRegCirclePlay
-              className={`text-slate-400 text-2xl cursor-pointer hover:scale-110 duration-200 ${pause ? 'block' : 'hidden'}`}
+              className={`text-slate-500 dark:text-slate-400 text-2xl cursor-pointer hover:scale-110 duration-200 ${pause ? 'block' : 'hidden'}`}
               onClick={() => setPause(!pause)}
             />
             <FaRegCirclePause
-              className={`text-slate-400 text-2xl cursor-pointer hover:scale-110 duration-200 ${pause ? 'hidden' : 'block'}`}
+              className={`text-slate-500 dark:text-slate-400 text-2xl cursor-pointer hover:scale-110 duration-200 ${pause ? 'hidden' : 'block'}`}
               onClick={() => setPause(!pause)}
             />
-            <span className={`${showTimer ? 'opacity-100' : 'opacity-0'} text-slate-400 inter-semibold text-base`}>{formatTime(timeInSeconds)}</span>
+            <span className={`${showTimer ? 'opacity-100' : 'opacity-0'} text-slate-500 dark:text-slate-400 inter-semibold text-base`}>{formatTime(timeInSeconds)}</span>
           </div>
 
-          <div className='text-slate-400 inter-medium text-base w-[110px] flex justify-center items-center'>
+          <div className='text-slate-500 dark:text-slate-400 inter-medium text-base w-[110px] flex justify-center items-center'>
             Mistakes: <span className={`font-bold ${mistakes >= 3 ? 'text-red-500' : 'dark:text-white text-black'}`}>{mistakes}/3</span>
           </div>
 
-          <div className='relative text-slate-400 w-[110px] flex justify-end items-center'>
+          <div className='relative text-slate-500 dark:text-slate-400 w-[110px] flex justify-end items-center'>
             <IoSettingsOutline className='z-10 text-2xl cursor-pointer hover:rotate-[110deg] duration-300'
               onClick={() => setShowSettings(!showSettings)}
             />
-            <div className={`${showSettings ? 'block' : 'hidden'} flex flex-col items-center justify-end z-0 absolute top-[-10px] right-[-10px] bg-slate-800 border-gray-700 text-base text-white rounded px-2 py-1 inter-semibold min-h-21 min-w-[200px]`}>
+            <div className={`${showSettings ? 'block' : 'hidden'} flex flex-col items-center justify-end z-0 absolute top-[-10px] right-[-10px] bg-slate-100 dark:bg-slate-800 border-[0.5px] border-[#e9edf3] dark:border-gray-700 text-base text-slate-500 dark:text-slate-400 rounded px-2 py-1 inter-semibold min-h-21 min-w-[200px]`}>
               <div className='flex gap-4 items-center justify-between mb-2'>
-                <span>Show Timer</span>
                 <button
                   onClick={toggle}
                   className={`w-12 h-6 flex items-center rounded-full p-1 duration-300 ease-in-out
-          ${showTimer ? "bg-green-800" : "bg-gray-400"}`}
+          ${showTimer ? "bg-green-400 dark:bg-green-800" : "bg-gray-400"}`}
                 >
                   <div
                     className={`bg-white w-4 h-4 rounded-full shadow-md transform duration-300 ease-in-out
             ${showTimer ? "translate-x-6" : "translate-x-0"}`}
                   />
                 </button>
+                <span>Show Timer</span>
               </div>
             </div>
           </div>
         </div>
 
-        <div className='bg-[#324465] w-full h-[1px]' />
+        <div className='bg-[#e9edf3] dark:bg-[#324465] w-full h-0.5 dark:h-[1px]' />
 
         <div className='flex items-stretch justify-between gap-4 mt-5 w-full h-[550px]'>
-          <div className='w-full max-w-[20%] flex flex-col items-center border-2 border-[#324465] rounded-lg p-2'>
-            <span className='text-base inter-regular text-slate-400'>Share with friends</span>
+          <div className='w-full max-w-[20%] flex flex-col items-center border-2 border-[#b2bfd2] dark:border-[#324465] rounded-lg p-2'>
+            <span className='text-base inter-regular text-slate-500 dark:text-slate-400'>Share with friends</span>
 
             <motion.button
               onClick={handleCopy}
-              className='relative flex items-center justify-center gap-2 duration-200 text-slate-400 rounded w-full py-2 mt-4 border-[#324465] border-[1px] cursor-pointer hover:bg-[#324465] hover:text-white'
+              className='relative flex items-center justify-center gap-2 duration-200 text-slate-500 dark:text-slate-400 rounded w-full py-2 mt-4 border-[#b2bfd2] dark:border-[#324465] border-[1px] cursor-pointer hover:bg-slate-300 dark:hover:bg-[#324465] hover:text-black dark:hover:text-white transition'
             >
               <motion.span
                 variants={copyLinkVariants}
@@ -455,18 +455,18 @@ const Game = ({ puzzle, sol }) => {
               </motion.span>
             </motion.button>
 
-            <span className='w-full text-sm text-slate-400 inter-regular text-center mt-4 text-wrap'>Share link to play together</span>
+            <span className='w-full text-sm text-slate-500 dark:text-slate-400 inter-regular text-center mt-4 text-wrap'>Share link to play together</span>
             <div className='mt-4 bg-white p-2 rounded'>
               <QRCodeCanvas value={multiplayerLink} size={128} bgColor={'#ffffff'} fgColor={'#000000'} />
             </div>
-            <span className='w-full text-sm text-slate-400 inter-regular text-center mt-4 text-wrap'>Scan code to join game</span>
+            <span className='w-full text-sm text-slate-500 dark:text-slate-400 inter-regular text-center mt-4 text-wrap'>Scan code to join game</span>
           </div>
 
           <div className='max-w-[65%] max-h-full'>
             <div className='relative h-full w-full'>
               {pause && (
                 <div className='absolute inset-0 z-20 bg-black/70 flex items-center justify-center rounded-xl'>
-                  <FaRegCirclePlay className='text-8xl text-slate-400 ' />
+                  <FaRegCirclePlay className='text-8xl text-slate-500 dark:text-slate-400 ' />
                 </div>
               )}
               
@@ -487,23 +487,23 @@ const Game = ({ puzzle, sol }) => {
 
                   let bgColor = ''
                   if (!isEditable) {
-                    bgColor = 'bg-[#060e22] font-bold';
+                    bgColor = 'bg-[#f1f1f2] dark:bg-[#060e22] font-bold';
                   } else if (isCellWrong(idx)) {
                     bgColor = 'bg-red-400 caret-white';
                   } else if (isSelected) {
-                    bgColor = 'bg-[#1b2131]';
+                    bgColor = 'bg-[#c8d8fa] dark:bg-[#1b2131]';
                   } else {
-                    bgColor = 'bg-[#020817] caret-transparent';
+                    bgColor = 'bg-white dark:bg-[#020817] caret-transparent';
                   }
 
                   return (
                     <div
                       key={idx}
-                      className={`flex items-center justify-center aspect-square w-full h-full text-center text-lg border border-[#2e3e5a] dark:border-[#25334d] dark:text-white focus:outline-none cursor-default
-                      ${isThickTop ? 'border-t-[3px] dark:border-t-[#3e434c]' : ''}
-                      ${isThickLeft ? 'border-l-[3px] dark:border-l-[#3e434c]' : ''}
-                      ${isThickBottom ? 'border-b-[3px] dark:border-b-[#3e434c]' : ''}
-                      ${isThickRight ? 'border-r-[3px] dark:border-r-[#3e434c]' : ''}
+                      className={`flex items-center justify-center aspect-square w-full h-full text-center text-lg border border-[#a0b1c8] dark:border-[#25334d] dark:text-white focus:outline-none cursor-default
+                      ${isThickTop ? 'border-t-[3px] dark:border-t-[#3e434c] border-t-[#a0b1c8] ' : ''}
+                      ${isThickLeft ? 'border-l-[3px] dark:border-l-[#3e434c] border-l-[#a0b1c8]' : ''}
+                      ${isThickBottom ? 'border-b-[3px] dark:border-b-[#3e434c] border-b-[#a0b1c8] ' : ''}
+                      ${isThickRight ? 'border-r-[3px] dark:border-r-[#3e434c] border-r-[#a0b1c8] ' : ''}
                       ${bgColor}`}
                       onClick={() => {
                         if (!isEditable) return
@@ -607,7 +607,7 @@ const Game = ({ puzzle, sol }) => {
               setUserGrid(prevState.userGrid);
               setNotesGrid(prevState.notesGrid);
             }}
-            className='flex w-16 aspect-square items-center justify-center rounded-xl text-2xl bg-slate-300 dark:bg-transparent border-2 border-[#324465] hover:border-[#152237] dark:text-gray-500 text-black hover:bg-slate-300 dark:hover:bg-[#152237] duration-200 dark:hover:text-white transition'
+            className='flex w-16 aspect-square items-center justify-center rounded-xl text-2xl bg-[#f1f5f9] dark:bg-transparent border-2 border-[#324465] hover:border-[#152237] dark:text-gray-500 text-black hover:bg-slate-300 dark:hover:bg-[#152237] duration-200 dark:hover:text-white transition'
           >
             <RiArrowGoBackLine />
           </button>
@@ -623,14 +623,14 @@ const Game = ({ puzzle, sol }) => {
               setUserGrid(nextState.userGrid);
               setNotesGrid(nextState.notesGrid);
             }}
-            className='flex w-16 aspect-square items-center justify-center rounded-xl text-2xl bg-slate-300 dark:bg-transparent border-2 border-[#324465] hover:border-[#152237] dark:text-gray-500 text-black hover:bg-slate-300 dark:hover:bg-[#152237] duration-200 dark:hover:text-white transition'
+            className='flex w-16 aspect-square items-center justify-center rounded-xl text-2xl bg-[#f1f5f9] dark:bg-transparent border-2 border-[#324465] dark:hover:border-[#152237] dark:text-gray-500 text-black hover:bg-slate-300 dark:hover:bg-[#152237] duration-200 dark:hover:text-white transition'
           >
             <RiArrowGoForwardLine />
           </button>
 
           <button
             onClick={() => setPenMode(prev => !prev)}
-            className='relative flex w-16 aspect-square items-center justify-center rounded-xl text-2xl bg-slate-300 dark:bg-transparent border-2 border-[#324465] hover:border-[#152237] dark:text-gray-500 text-black hover:bg-slate-300 dark:hover:bg-[#152237] duration-200 dark:hover:text-white transition'
+            className='relative flex w-16 aspect-square items-center justify-center rounded-xl text-2xl bg-[#f1f5f9] dark:bg-transparent border-2 border-[#324465] hover:border-[#152237] dark:text-gray-500 text-black hover:bg-slate-300 dark:hover:bg-[#152237] duration-200 dark:hover:text-white transition'
           >
             <div className={`absolute top-[-10px] right-[-10px] bg-gray-600 ${penMode ? 'text-green-300' : 'text-slate-300'} text-xs rounded-full px-2 py-1 inter-semibold`}>
               {penMode ? 'On' : 'Off'}

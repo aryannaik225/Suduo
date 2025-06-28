@@ -71,7 +71,7 @@ const ChatBox = ({ roomId, playersList = [] }) => {
   };
 
   return (
-    <div className='h-full w-full rounded border-[2px] border-[#324465] flex flex-col pb-3 bg-[#0a162f]'>
+    <div className='h-full w-full rounded border-[2px] border-[#b2bfd2] dark:border-[#324465] flex flex-col pb-3 bg-[#f1f1f2] dark:bg-[#0a162f]'>
 
       <div className='flex items-center justify-end p-3 w-full flex-wrap gap-3'>
         {/* <div className='relative group'>
@@ -95,14 +95,14 @@ const ChatBox = ({ roomId, playersList = [] }) => {
               alt='profile avatar'
               className='rounded-full outline-[3px] outline-blue-400 outline-offset-2'
             />
-            <span className='absolute bottom-full mb-2 left-1/2 -translate-x-1/2 bg-gray-800 text-white text-sm px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200 whitespace-nowrap z-10'>
+            <span className='absolute bottom-full mb-2 left-1/2 -translate-x-1/2 bg-slate-300 text-slate-800 dark:bg-gray-800 dark:text-white text-sm px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200 whitespace-nowrap z-10'>
               {player.username}
             </span>
           </div>
         ))}
       </div>
 
-      <div className='w-full h-[1px] bg-[#324465]' />
+      <div className='w-full h-[1px] bg-[#b2bfd2] dark:bg-[#324465]' />
 
       {/* Messages */}
       <div className='flex justify-start overflow-y-scroll h-full max-h-[280px] p-3 no-scrollbar flex-col w-full'>
@@ -117,8 +117,8 @@ const ChatBox = ({ roomId, playersList = [] }) => {
                 className="rounded-full"
               />
               <div className={`flex flex-col ${msg.username === username ? 'items-end' : 'items-start'}`}>
-                <span className='text-xs text-slate-400'>{msg.username}</span>
-                <span className='text-sm text-white bg-[#182642] px-3 py-1 rounded-lg max-w-[200px] break-words'>{msg.message}</span>
+                <span className='text-xs text-slate-700 dark:text-slate-400'>{msg.username}</span>
+                <span className='text-sm text-black dark:text-white bg-[#dcdde2] dark:bg-[#182642] px-3 py-1 rounded-lg max-w-[200px] break-words'>{msg.message}</span>
               </div>
             </div>
           </div>
@@ -134,11 +134,11 @@ const ChatBox = ({ roomId, playersList = [] }) => {
           value={input}
           onChange={(e) => setInput(e.target.value)}
           onKeyDown={handleKeyPress}
-          className="flex-1 bg-[#152237] text-white px-3 py-2 rounded-lg outline-none border border-[#324465] placeholder:text-slate-400 text-[15px]"
+          className="flex-1 bg-[#d7dae0] dark:bg-[#152237] text-[#1f1f1f] dark:text-white px-3 py-2 rounded-lg outline-none border border-[#b2bfd2] dark:border-[#324465] placeholder:text-slate-500 dark:placeholder:text-slate-400 text-[15px]"
         />
         <button
           onClick={handleSend}
-          className='bg-[#324465] text-white px-4 rounded-lg hover:bg-[#415a89] duration-200 flex items-center justify-center'
+          className='bg-[#d7dae0] dark:bg-[#324465] text-white px-4 rounded-lg hover:bg-[#b2bfd2] dark:hover:bg-[#415a89] duration-200 flex items-center justify-center'
         >
           <IoSend className="text-xl" />
         </button>

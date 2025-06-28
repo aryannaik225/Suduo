@@ -10,6 +10,7 @@ import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import axios from 'axios';
 import { getSessionData } from '@/firebase/firestoreUtils';
+import FooterForGame from '@/components/FooterForGame';
 
 export default function Home() {
 
@@ -105,13 +106,13 @@ export default function Home() {
     return (
       <div className="flex items-center justify-center h-screen">
         <ToastContainer />
-        <div className="flex gap-1 text-2xl text-white items-center poppins-regular">
+        <div className="flex gap-1 text-2xl text-black dark:text-white items-center poppins-regular">
           Joining Game
           <div className=''>
             <DotPulse
               size="20"
               speed="1.3"
-              color="white"
+              color={theme === 'dark' ? '#ffffff' : '#000000'}
             />
           </div>
         </div>
@@ -119,10 +120,13 @@ export default function Home() {
     )
   }
   return (
-    <div>
+    <div className='relative w-screen h-auto min-h-screen'>
       <ToastContainer />
       <NavBar theme={theme} setTheme={setTheme} />
       <Game puzzle={puzzle} sol={solution} />
+      <div className='w-screen h-auto'>
+        <FooterForGame />
+      </div>
     </div>
   )
 }

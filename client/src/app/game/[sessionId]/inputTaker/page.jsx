@@ -145,34 +145,34 @@ export default function Home() {
 
 
   return (
-    <div className="relative w-screen h-screen flex justify-center items-center bg-gradient-to-br from-[#0f172a] via-[#0a0f1f] to-[#0f172a] overflow-hidden">
+    <div className="relative w-screen h-screen flex justify-center items-center bg-gradient-to-br from-white via-gray-100 to-white dark:from-[#0f172a] dark:via-[#0a0f1f] dark:to-[#0f172a] overflow-hidden">
       <ToastContainer />
 
       {/* Glowing blobs in the background */}
       <div className="absolute w-full h-full pointer-events-none z-0">
-        <div className="absolute top-1/4 left-1/4 w-40 h-40 bg-cyan-400 opacity-10 blur-3xl rounded-full animate-pulse"></div>
-        <div className="absolute top-[60%] right-[20%] w-52 h-52 bg-purple-500 opacity-10 blur-2xl rounded-full animate-ping"></div>
+        <div className="absolute top-1/4 left-1/4 w-40 h-40 bg-cyan-400 opacity-20 blur-3xl rounded-full animate-pulse dark:opacity-10"></div>
+        <div className="absolute top-[60%] right-[20%] w-52 h-52 bg-purple-500 opacity-20 blur-2xl rounded-full animate-ping dark:opacity-10"></div>
       </div>
 
       {/* Centered container with glassmorphism and glowing box shadow */}
-      <div className="relative z-10 flex flex-col items-center min-h-10 w-80 backdrop-blur-md bg-white/7 border border-white/10 p-8 rounded-2xl shadow-[0_0_30px_rgba(0,255,255,0.1)]">
-        <div className="text-2xl font-semibold text-white mb-8 text-center">
+      <div className="relative z-10 flex flex-col items-center min-h-10 w-80 backdrop-blur-md bg-white/80 dark:bg-white/5 border border-gray-200 dark:border-white/10 p-8 rounded-2xl shadow-[0_0_30px_rgba(0,0,0,0.05)] dark:shadow-[0_0_30px_rgba(0,255,255,0.1)]">
+        <div className="text-2xl font-semibold text-gray-800 dark:text-white mb-8 text-center" onClick={() => setTheme(prev => prev === 'dark' ? 'light' : 'dark')}>
           Enter Your Username
         </div>
 
-        <div className="w-full px-4 py-3 mb-5 rounded-md border border-cyan-400/30 bg-transparent focus-within:ring-2 focus-within:ring-cyan-400/30">
+        <div className="w-full px-4 py-3 mb-5 rounded-md border border-cyan-500/30 bg-white dark:bg-transparent focus-within:ring-2 focus-within:ring-cyan-400/30">
           <input
             type="text"
             placeholder="Enter your username"
             value={name}
             onChange={(e) => setName(e.target.value)}
-            className="w-full bg-transparent placeholder:text-slate-400 text-white text-[15px] focus:outline-none"
+            className="w-full bg-transparent placeholder:text-gray-400 text-gray-800 dark:text-white text-[15px] focus:outline-none"
           />
         </div>
 
         <button
           onClick={handleStartGame}
-          className="mt-2 w-full py-3 bg-cyan-500/10 border border-cyan-400 text-cyan-200 rounded-md hover:bg-cyan-500/20 transition-all duration-200 shadow-[0_0_20px_rgba(0,255,255,0.15)] flex justify-center items-center"
+          className="mt-2 w-full py-3 bg-cyan-500/10 dark:bg-cyan-500/10 border border-cyan-400 text-cyan-700 dark:text-cyan-200 rounded-md hover:bg-cyan-500/20 transition-all duration-200 shadow-[0_0_20px_rgba(0,200,255,0.1)] dark:shadow-[0_0_20px_rgba(0,255,255,0.15)] flex justify-center items-center"
           disabled={!name || loading}
         >
           {loading

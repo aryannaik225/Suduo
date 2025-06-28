@@ -18,11 +18,12 @@ const NavBar = ({theme, setTheme}) => {
       <div className='flex items-center justify-between w-8/12'>
         <div>
           <Image 
-            src="/suduo_logo.svg"
+            src={theme === 'dark' ? '/suduo_logo.svg' : '/suduo_logo-light.svg'}
             alt="Suduo Logo"
             width={90}
             height={90}
             className='cursor-pointer'
+            onClick={() => window.location.href = '/'}
           />
         </div>
         <div className='text-2xl'>

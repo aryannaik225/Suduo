@@ -10,7 +10,6 @@ import axios from 'axios';
 import { nanoid } from 'nanoid';
 import { createSession } from '@/firebase/firestoreUtils';
 import Footer from '@/components/Footer';
-import NavBar from '@/components/NavBar';
 
 const difficulties = ['Easy', 'Medium', 'Hard', 'Insane', 'Inhuman']
 
@@ -137,11 +136,10 @@ export default function Home() {
 
       <div className="absolute inset-0 z-0 opacity-20 bg-[url('/sudoku-bg-dark.svg')] dark:bg-[url('/sudoku-bg.svg')] bg-center bg-cover blur-sm"></div>
 
-      <NavBar theme={theme} setTheme={setTheme}/>
 
       <div className='relative z-10 flex flex-col items-center min-h-10 w-80'>
 
-        <div className='text-3xl poppins-semibold text-black dark:text-white mb-5'>
+        <div className='text-3xl poppins-semibold text-black dark:text-white mb-5' onClick={() => setTheme(prev => prev === 'dark' ? 'light' : 'dark')}>
           Select Difficulty
         </div>
 
@@ -177,7 +175,7 @@ export default function Home() {
         </div>
 
         <button
-          className='mt-5 w-full py-3 bg-black dark:bg-gray-800 text-white rounded-lg text-[15px] inter-regular hover:bg-gray-900 dark:hover:bg-gray-700 duration-200 transition flex justify-center items-center'
+          className='mt-5 w-full py-3 bg-gray-300 dark:bg-gray-800 text-black dark:text-white rounded-lg text-[15px] inter-regular hover:bg-gray-400 dark:hover:bg-gray-700 duration-200 transition flex justify-center items-center'
           onClick={handleStartGame}
           disabled={loading}
         >
