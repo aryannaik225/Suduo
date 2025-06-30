@@ -16,6 +16,7 @@ import { useParams, useRouter } from 'next/navigation'
 import isEqual from 'lodash/isEqual';
 import { toast } from 'react-toastify'
 import DecryptedText from './ui/DecryptedText'
+import ReactConfetti from 'react-confetti'
 
 
 const Game = ({ puzzle, sol }) => {
@@ -37,6 +38,7 @@ const Game = ({ puzzle, sol }) => {
   const router = useRouter()
   const [showTimer, setShowTimer] = useState(true)
   const [showSettings, setShowSettings] = useState(false)
+  const [won, setWon] = useState(false)
 
   const toggle = () => {
     setShowTimer(!showTimer);
@@ -396,11 +398,25 @@ const Game = ({ puzzle, sol }) => {
     };
   }, [sessionId]);
 
+  // ---------------- Game Win Logic ---------------
+  
+  useEffect(() => {
+    const hasUserWon = initialGrid.every((cell, idx) => {
+      if (cell !== null) return true
+
+      return userGrid[idx] !== null && userGrid[idx] === solution[idx]
+    })
+
+    if (hasUserWon) {
+      setWon(true)
+    }
+  })
 
 
 
   return (
     <div className='flex justify-center mb-5 h-auto'>
+      {won && <ReactConfetti width={window.innerWidth} height={window.innerHeight}/>}
       <div className='max-h-[800px] w-[80%] max-w-[1228px] rounded-2xl border-[3px] border-[#e0e5ee] dark:border-[#324465] flex flex-col items-center p-5 shadow-[0_0_30px_rgba(127,205,255,0.6)] dark:shadow-[0_0_30px_rgba(0,255,255,0.2)] bg-white dark:bg-transparent'>
         <div className='flex items-center justify-between w-full mb-3'>
           <div className='flex gap-2 items-center text-lg w-[110px] justify-start'>
