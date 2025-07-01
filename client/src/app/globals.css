@@ -25,6 +25,57 @@ body {
   overflow-x: hidden;
 }
 
+
+
+
+.theme-toggle svg {
+  transition: transform 0.5s ease-in-out;
+}
+
+@layer base {
+  html {
+    transition: background-color 0.3s ease, color 0.3s ease;
+  }
+  
+  body {
+    transition: background-color 0.3s ease, color 0.3s ease;
+  }
+}
+
+@layer utilities {
+  @keyframes gradient {
+    0% {
+      background-position: 0% 50%;
+    }
+    50% {
+      background-position: 100% 50%;
+    }
+    100% {
+      background-position: 0% 50%;
+    }
+  }
+
+  .animate-gradient {
+    animation: gradient 8s linear infinite;
+  }
+}
+
+/* Hide scrollbar for Chrome, Safari and Opera */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+/* Hide scrollbar for IE, Edge and Firefox */
+.no-scrollbar {
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;  /* Firefox */
+}
+
+button {
+  cursor: pointer;
+}
+
+
 @font-face {
   font-family: "poppins-thin";
   src: url("../../public/fonts/Poppins/Poppins-Thin.ttf");
@@ -167,35 +218,4 @@ body {
 
 .inter-black {
   font-family: 'inter-black';
-}
-
-
-
-.theme-toggle svg {
-  transition: transform 0.5s ease-in-out;
-}
-
-@layer base {
-  html {
-    transition: background-color 0.3s ease, color 0.3s ease;
-  }
-
-  body {
-    transition: background-color 0.3s ease, color 0.3s ease;
-  }
-}
-
-/* Hide scrollbar for Chrome, Safari and Opera */
-.no-scrollbar::-webkit-scrollbar {
-  display: none;
-}
-
-/* Hide scrollbar for IE, Edge and Firefox */
-.no-scrollbar {
-  -ms-overflow-style: none;  /* IE and Edge */
-  scrollbar-width: none;  /* Firefox */
-}
-
-button {
-  cursor: pointer;
 }

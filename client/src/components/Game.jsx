@@ -17,6 +17,8 @@ import isEqual from 'lodash/isEqual';
 import { toast } from 'react-toastify'
 import DecryptedText from './ui/DecryptedText'
 import ReactConfetti from 'react-confetti'
+import GradientText from './ui/GradientText'
+import { set } from 'lodash'
 
 
 const Game = ({ puzzle, sol }) => {
@@ -38,7 +40,18 @@ const Game = ({ puzzle, sol }) => {
   const router = useRouter()
   const [showTimer, setShowTimer] = useState(true)
   const [showSettings, setShowSettings] = useState(false)
-  const [won, setWon] = useState(false)
+  const [won, setWon] = useState(true)
+  const confettiRef = useRef(null)
+  const [dimensions, setDimensions] = useState({ width: 0, height: 0 })
+  const [showOptions, setShowOptions] = useState(false)
+  const [showOptionsFailed, setShowOptionsFailed] = useState(false)
+  const buttonRef = useRef(null)
+  const buttonRefFailed = useRef(null)
+  const [buttonWidth, setButtonWidth] = useState(0)
+  const [buttonWidthFailed, setButtonWidthFailed] = useState(0)
+  const difficulties = ["Easy", "Medium", "Hard", "Insane", "Inhuman"];
+
+  // ---------------- Random Logic ---------------
 
   const toggle = () => {
     setShowTimer(!showTimer);
@@ -58,6 +71,27 @@ const Game = ({ puzzle, sol }) => {
     setFailed(false)
     setPause(false)
   }
+
+  useEffect(() => {
+    if (confettiRef.current) {
+      const { offsetWidth, offsetHeight } = confettiRef.current;
+      setDimensions({ width: offsetWidth, height: offsetHeight });
+    }
+  }, [won])
+
+  useEffect(() => {
+    if (buttonRef.current) {
+      setButtonWidth(buttonRef.current.offsetWidth);
+    }
+  }, [won, showOptions]);
+
+  useEffect(() => {
+    if (buttonRefFailed.current) {
+      setButtonWidthFailed(buttonRefFailed.current.offsetWidth);
+    }
+  }, [failed, showOptionsFailed]);
+
+
 
 
   // ---------------- Player Logic ---------------
@@ -399,7 +433,7 @@ const Game = ({ puzzle, sol }) => {
   }, [sessionId]);
 
   // ---------------- Game Win Logic ---------------
-  
+
   useEffect(() => {
     const hasUserWon = initialGrid.every((cell, idx) => {
       if (cell !== null) return true
@@ -409,6 +443,7 @@ const Game = ({ puzzle, sol }) => {
 
     if (hasUserWon) {
       setWon(true)
+      setPause(true)
     }
   })
 
@@ -416,7 +451,7 @@ const Game = ({ puzzle, sol }) => {
 
   return (
     <div className='flex justify-center mb-5 h-auto'>
-      {won && <ReactConfetti width={window.innerWidth} height={window.innerHeight}/>}
+      {/* {won && <ReactConfetti width={window.innerWidth} height={window.innerHeight}/>} */}
       <div className='max-h-[800px] w-[80%] max-w-[1228px] rounded-2xl border-[3px] border-[#e0e5ee] dark:border-[#324465] flex flex-col items-center p-5 shadow-[0_0_30px_rgba(127,205,255,0.6)] dark:shadow-[0_0_30px_rgba(0,255,255,0.2)] bg-white dark:bg-transparent'>
         <div className='flex items-center justify-between w-full mb-3'>
           <div className='flex gap-2 items-center text-lg w-[110px] justify-start'>
@@ -502,16 +537,78 @@ const Game = ({ puzzle, sol }) => {
             <span className='w-full text-sm text-slate-500 dark:text-slate-400 inter-regular text-center mt-4 text-wrap'>Scan code to join game</span>
           </div>
 
-          <div className='max-w-[65%] max-h-full'>
+          <div className='max-w-[65%] max-h-full' ref={confettiRef}>
             <div className='relative h-full w-full'>
-              {pause && !failed && (
-                <div className='absolute inset-0 z-20 bg-black/70 flex items-center justify-center rounded-xl'>
+
+              {won && (
+                <div className='absolute inset-0 z-20 bg-[#596a84] dark:bg-[#31425d] flex flex-col gap-5 items-center justify-center'>
+                  <ReactConfetti width={dimensions.width} height={dimensions.height} />
+                  <motion.div
+                    initial={{ opacity: 0, scale: 0.5 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    transition={{ duration: 0.3, ease: 'easeInOut' }}
+                    className=''
+                  >
+                    <GradientText
+                      colors={["#ff4d4f", "#ffc53d", "#40a9ff", "#73d13d", "#ffc53d"]}
+                      animationSpeed={5}
+                      showBorder={false}
+                      className='text-7xl inter-bold'
+                    >
+                      gg
+                    </GradientText>
+                  </motion.div>
+                  <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.5, delay: 0.4, ease: 'easeInOut' }}
+                    className='text-3xl text-white inter-semibold'
+                  >
+                    You solved the puzzle!!🎉
+                  </motion.div>
+                  <div className='relative inline-block'>
+                    <motion.button
+                      ref={buttonRef}
+                      onClick={() => setShowOptions((prev) => !prev)}
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ duration: 0.5, delay: 0.6, ease: 'easeInOut' }}
+                      className='py-2 px-4 bg-white text-[#31425d] rounded-md inter-medium text-base hover:bg-gray-300 dark:hover:bg-[#465267] dark:hover:text-white transition duration-200'
+                    >
+                      New Game
+                    </motion.button>
+                    {showOptions && (
+                      <ul
+                        className="absolute mt-2 bg-white dark:bg-[#101929] text-[#31425d] dark:text-white rounded-md shadow-md overflow-hidden z-10"
+                        style={{ width: `${buttonWidth}px` }}
+                      >
+                        {difficulties.map((level) => (
+                          <li
+                            key={level}
+                            className="px-4 py-2 text-sm hover:bg-gray-200 dark:hover:bg-[#465267] cursor-pointer transition duration-150"
+                            onClick={() => {
+                              setShowOptions(false);
+                              console.log("Selected difficulty:", level);
+                            }}
+                          >
+                            {level}
+                          </li>
+                        ))}
+                      </ul>
+                    )}
+                  </div>
+
+                </div>
+              )}
+
+              {pause && !failed && !won && (
+                <div className='absolute inset-0 z-20 dark:bg-black/70 bg-gray-300 flex items-center justify-center rounded-xl'>
                   <FaRegCirclePlay className='text-8xl text-slate-500 dark:text-slate-400 ' />
                 </div>
               )}
 
               {failed && (
-                <div className='absolute inset-0 z-20 bg-[#31425d] flex flex-col items-center justify-center'>
+                <div className='absolute inset-0 z-20 dark:bg-[#31425d] bg-slate-300 flex flex-col items-center justify-center'>
                   <DecryptedText
                     text="Game Over!"
                     speed={100}
@@ -519,7 +616,7 @@ const Game = ({ puzzle, sol }) => {
                     animateOn='view'
                     revealDirection='start'
                     sequential={true}
-                    className='text-4xl text-white inter-semibold mb-2'
+                    className='text-4xl dark:text-white text-[#101010] inter-semibold mb-2'
                   />
 
                   <div className='relative flex mt-5 mb-5' onClick={handleSecondChange}>
@@ -527,17 +624,42 @@ const Game = ({ puzzle, sol }) => {
                       <motion.div
                         animate={{ scale: [1, 1.5, 1] }}
                         transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
-                        className='h-full w-[80%] rounded-lg bg-white opacity-10 duration-200'
+                        className='h-full w-[80%] rounded-lg bg-slate-700 dark:bg-white opacity-10 duration-200'
                       ></motion.div>
                     </div>
 
-                    <div className='relative flex items-center justify-center py-[10px] px-3 bg-white rounded-md text-[#31425d] inter-medium cursor-pointer hover:bg-gray-300 z-10'>
+                    <div className='relative flex items-center justify-center py-[10px] px-3 bg-slate-500 dark:bg-white rounded-md text-white dark:text-[#31425d] inter-medium cursor-pointer hover:bg-gray-300 z-10'>
                       Second Chance
                     </div>
                   </div>
 
-                  <div className='text-white inter-medium text-base mt-2 hover:underline cursor-pointer transition'>
-                    New Game
+                  <div className='relative inline-block'>
+                    <button
+                      ref={buttonRefFailed}
+                      onClick={() => setShowOptionsFailed((prev) => !prev)}
+                      className='py-2 px-4 bg-white text-[#31425d] rounded-md inter-medium text-base hover:bg-gray-300 dark:hover:bg-[#465267] dark:hover:text-white transition duration-200'
+                    >
+                      New Game
+                    </button>
+                    {showOptionsFailed && (
+                      <ul
+                        className="absolute mt-2 bg-white dark:bg-[#101929] text-[#31425d] dark:text-white rounded-md shadow-md overflow-hidden z-10"
+                        style={{ width: `${buttonWidthFailed}px` }}
+                      >
+                        {difficulties.map((level) => (
+                          <li
+                            key={level}
+                            className="px-4 py-2 text-sm hover:bg-gray-200 dark:hover:bg-[#465267] cursor-pointer transition duration-150"
+                            onClick={() => {
+                              setShowOptionsFailed(false);
+                              console.log("Selected difficulty:", level);
+                            }}
+                          >
+                            {level}
+                          </li>
+                        ))}
+                      </ul>
+                    )}
                   </div>
 
                 </div>
