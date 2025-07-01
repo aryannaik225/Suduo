@@ -240,6 +240,16 @@ const Game = ({ puzzle, sol }) => {
 
       switch (e.key) {
         case 'ArrowUp':
+        case 'ArrowDown':
+        case 'ArrowLeft':
+        case 'ArrowRight':
+        case 'Tab':
+          e.preventDefault();
+          break
+      }
+
+      switch (e.key) {
+        case 'ArrowUp':
           moveTo((row - 1 + 9) % 9, col);
           break;
         case 'ArrowDown':
