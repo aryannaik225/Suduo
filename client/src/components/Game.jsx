@@ -676,7 +676,7 @@ const Game = ({ puzzle, sol }) => {
 
               {pause && !failed && !won && (
                 <div className='absolute inset-0 z-20 dark:bg-black/70 bg-gray-300 flex items-center justify-center rounded-xl'>
-                  <FaRegCirclePlay className='text-8xl text-slate-500 dark:text-slate-400 ' />
+                  <FaRegCirclePlay onClick={() => {setPause(!pause)}} className='text-8xl text-slate-500 dark:text-slate-400 cursor-pointer' />
                 </div>
               )}
 
