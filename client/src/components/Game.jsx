@@ -19,6 +19,7 @@ import DecryptedText from './ui/DecryptedText'
 import ReactConfetti from 'react-confetti'
 import GradientText from './ui/GradientText'
 import { set } from 'lodash'
+import axios from 'axios'
 
 
 const Game = ({ puzzle, sol }) => {
@@ -40,7 +41,7 @@ const Game = ({ puzzle, sol }) => {
   const router = useRouter()
   const [showTimer, setShowTimer] = useState(true)
   const [showSettings, setShowSettings] = useState(false)
-  const [won, setWon] = useState(true)
+  const [won, setWon] = useState(false)
   const confettiRef = useRef(null)
   const [dimensions, setDimensions] = useState({ width: 0, height: 0 })
   const [showOptions, setShowOptions] = useState(false)
@@ -50,6 +51,8 @@ const Game = ({ puzzle, sol }) => {
   const [buttonWidth, setButtonWidth] = useState(0)
   const [buttonWidthFailed, setButtonWidthFailed] = useState(0)
   const difficulties = ["Easy", "Medium", "Hard", "Insane", "Inhuman"];
+  const [loading, setLoading] = useState(false)
+  const [selectedDifficulty, setSelectedDifficulty] = useState('Easy')
 
   // ---------------- Random Logic ---------------
 
@@ -448,6 +451,64 @@ const Game = ({ puzzle, sol }) => {
   })
 
 
+  // ---------------- New Game Logic ---------------
+
+  const handleNewGame = async () => {
+
+    setLoading(true)
+
+    try {
+
+      const res = await axios.get(`/api/generate-sudoku?difficulty=${selectedDifficulty}`);
+      const { puzzle, solution, difficultyRating } = res.data;
+      if (!puzzle || !solution) {
+        throw new Error('Failed to generate puzzle');
+      }
+
+      const flattenedPuzzle = puzzle.flat();
+      const flattenedSolution = solution.flat();
+
+      setInitialGrid(flattenedPuzzle);
+      setSolution(flattenedSolution);
+      setUserGrid(Array(81).fill(null));
+      setNotesGrid(Array(81).fill(new Set()));
+      setMistakes(0);
+      setFailed(false);
+      setWon(false);
+      setPause(false);
+      setUndoStack([]);
+      setRedoStack([]);
+      setSelectedCell(null);
+      setTimeInSeconds(0);
+      setShowOptions(false);
+      setShowOptionsFailed(false);
+
+      await updateSession(sessionId, {
+        initialGrid: flattenedPuzzle,
+        solution: flattenedSolution,
+        userGrid: Array(81).fill(null),
+        notesGrid: Object.fromEntries(Array(81).fill().map((_, idx) => [idx, []])),
+        mistakes: 0,
+        pause: false,
+        failed: false,
+        undoStack: [],
+        redoStack: [],
+        lastUpdatedBy: playerId
+      });
+
+    } catch (error) {
+      console.error("Error creating new game:", error);
+      toast.error('Failed to create new game. Please try again.', {
+        position: 'top-center',
+        autoClose: 3000,
+        pauseOnHover: true,
+        theme: 'dark'
+      });
+      setLoading(false);
+    }
+  }
+
+
 
   return (
     <div className='flex justify-center mb-5 h-auto'>
@@ -587,7 +648,9 @@ const Game = ({ puzzle, sol }) => {
                             key={level}
                             className="px-4 py-2 text-sm hover:bg-gray-200 dark:hover:bg-[#465267] cursor-pointer transition duration-150"
                             onClick={() => {
+                              setSelectedDifficulty(level);
                               setShowOptions(false);
+                              handleNewGame();
                               console.log("Selected difficulty:", level);
                             }}
                           >
@@ -651,7 +714,9 @@ const Game = ({ puzzle, sol }) => {
                             key={level}
                             className="px-4 py-2 text-sm hover:bg-gray-200 dark:hover:bg-[#465267] cursor-pointer transition duration-150"
                             onClick={() => {
+                              setSelectedDifficulty(level);
                               setShowOptionsFailed(false);
+                              handleNewGame();
                               console.log("Selected difficulty:", level);
                             }}
                           >
