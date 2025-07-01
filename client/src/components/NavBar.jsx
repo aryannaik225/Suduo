@@ -15,7 +15,7 @@ const NavBar = ({theme, setTheme}) => {
 
   return (
     <div className='flex justify-center mt-5 mb-5'>
-      <div className='flex items-center justify-between w-8/12'>
+      <div className='flex items-center justify-between w-11/12 sm:w-8/12'>
         <div>
           <Image 
             src={theme === 'dark' ? '/suduo_logo.svg' : '/suduo_logo-light.svg'}

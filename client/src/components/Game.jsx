@@ -521,9 +521,9 @@ const Game = ({ puzzle, sol }) => {
 
 
   return (
-    <div className='flex justify-center mb-5 h-auto'>
+    <div className='flex justify-center mb-5 h-auto px-0 sm:px-4'>
       {/* {won && <ReactConfetti width={window.innerWidth} height={window.innerHeight}/>} */}
-      <div className='max-h-[800px] w-[80%] max-w-[1228px] rounded-2xl border-[3px] border-[#e0e5ee] dark:border-[#324465] flex flex-col items-center p-5 shadow-[0_0_30px_rgba(127,205,255,0.6)] dark:shadow-[0_0_30px_rgba(0,255,255,0.2)] bg-white dark:bg-transparent'>
+      <div className='w-full max-w-[1228px] rounded-2xl border-0 sm:border-[3px] border-[#e0e5ee] dark:border-[#324465] flex flex-col items-center p-5 sm:shadow-[0_0_30px_rgba(127,205,255,0.6)] sm:dark:shadow-[0_0_30px_rgba(0,255,255,0.2)] bg-white dark:bg-transparent'>
         <div className='flex items-center justify-between w-full mb-3'>
           <div className='flex gap-2 items-center text-lg w-[110px] justify-start'>
             <FaRegCirclePlay
@@ -571,8 +571,8 @@ const Game = ({ puzzle, sol }) => {
 
         <div className='bg-[#e9edf3] dark:bg-[#324465] w-full h-0.5 dark:h-[1px]' />
 
-        <div className='flex items-stretch justify-between gap-4 mt-5 w-full h-[550px]'>
-          <div className='w-full max-w-[20%] flex flex-col items-center border-2 border-[#b2bfd2] dark:border-[#324465] rounded-lg p-2'>
+        <div className='flex flex-col sm:flex-row items-stretch justify-between gap-4 mt-5 w-full h-[550px]'>
+          <div className='hidden w-full max-w-[20%] sm:flex flex-col items-center border-2 border-[#b2bfd2] dark:border-[#324465] rounded-lg p-2'>
             <span className='text-base inter-regular text-slate-500 dark:text-slate-400'>Share with friends</span>
 
             <motion.button
@@ -608,7 +608,7 @@ const Game = ({ puzzle, sol }) => {
             <span className='w-full text-sm text-slate-500 dark:text-slate-400 inter-regular text-center mt-4 text-wrap'>Scan code to join game</span>
           </div>
 
-          <div className='max-w-[65%] max-h-full' ref={confettiRef}>
+          <div className='w-full sm:max-w-[65%] max-h-full' ref={confettiRef}>
             <div className='relative h-full w-full'>
 
               {won && (
@@ -624,7 +624,7 @@ const Game = ({ puzzle, sol }) => {
                       colors={["#ff4d4f", "#ffc53d", "#40a9ff", "#73d13d", "#ffc53d"]}
                       animationSpeed={5}
                       showBorder={false}
-                      className='text-7xl inter-bold'
+                      className='text-6xl sm:text-7xl inter-bold'
                     >
                       gg
                     </GradientText>
@@ -633,7 +633,7 @@ const Game = ({ puzzle, sol }) => {
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.5, delay: 0.4, ease: 'easeInOut' }}
-                    className='text-3xl text-white inter-semibold'
+                    className='text-xl sm:text-3xl text-white inter-semibold'
                   >
                     You solved the puzzle!!🎉
                   </motion.div>
@@ -800,13 +800,15 @@ const Game = ({ puzzle, sol }) => {
 
           <div className='w-full h-full flex flex-col items-center justify-between gap-3'>
 
-            <ChatBox roomId={sessionId} playersList={playersList} />
+            <div className='w-full h-full order-1 sm:order-none'>
+              <ChatBox roomId={sessionId} playersList={playersList} />
+            </div>
 
-            <div className='grid grid-cols-5 w-full gap-2'>
+            <div className='grid grid-cols-10 sm:grid-cols-5 w-full gap-1 sm:gap-2'>
               {[...Array(9)].map((_, i) => (
                 <button
                   key={i + 1}
-                  className={`w-full aspect-square py-3 bg-slate-300 dark:bg-[#152237] dark:text-gray-500 text-black rounded text-xl font-semibold ${pause ? '' : 'hover:bg-slate-400 dark:hover:bg-[#101929] duration-200 dark:hover:text-white transition'}`}
+                  className={`w-full aspect-square p-1 sm:py-3 bg-slate-300 dark:bg-[#020817] sm:dark:bg-[#152237] dark:text-gray-200 sm:dark:text-gray-500 border-[1px] sm:border-0 border-slate-700 text-black rounded text-base sm:text-xl font-semibold ${pause ? '' : 'hover:bg-slate-400 dark:hover:bg-[#101929] duration-200 dark:hover:text-white transition'}`}
                   onClick={() => {
                     if (pause || selectedCell === null) return
 
@@ -842,7 +844,7 @@ const Game = ({ puzzle, sol }) => {
                 </button>
               ))}
               <button
-                className={`w-full py-3 bg-slate-300 dark:bg-[#152237] dark:text-gray-500 text-black rounded text-xl font-semibold ${pause ? '' : 'hover:bg-slate-400 dark:hover:bg-[#101929] duration-200 dark:hover:text-white transition'} flex items-center justify-center`}
+                className={`w-full p-1 sm:py-3 bg-slate-300 dark:bg-[#020817] sm:dark:bg-[#152237] dark:text-gray-200 sm:dark:text-gray-500 border-[1px] sm:border-0 border-slate-700 text-black rounded text-sm sm:text-xl font-semibold ${pause ? '' : 'hover:bg-slate-400 dark:hover:bg-[#101929] duration-200 dark:hover:text-white transition'} flex items-center justify-center`}
                 onClick={() => {
                   if (pause || selectedCell === null) return
 
@@ -859,7 +861,7 @@ const Game = ({ puzzle, sol }) => {
 
                 }}
               >
-                <FaBackspace className='text-2xl mr-[1px]' />
+                <FaBackspace className='text-lg sm:text-2xl mr-[1px]' />
               </button>
             </div>
           </div>
