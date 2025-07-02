@@ -14,7 +14,7 @@ const NavBar = ({theme, setTheme}) => {
   }
 
   return (
-    <div className='flex justify-center mt-5 mb-5'>
+    <div className='flex justify-center mt-5'>
       <div className='flex items-center justify-between w-11/12 sm:w-8/12'>
         <div>
           <Image 
@@ -22,7 +22,7 @@ const NavBar = ({theme, setTheme}) => {
             alt="Suduo Logo"
             width={90}
             height={90}
-            className='cursor-pointer'
+            className='cursor-pointer w-16 sm:w-[90px] h-16 sm:h-[90px]'
             onClick={() => window.location.href = '/'}
           />
         </div>

@@ -11,7 +11,7 @@ const FooterForGame = () => {
         Built for puzzle lovers ❤️ By{' '}
         <span
           onClick={handleAuthorClick}
-          className="cursor-pointer"
+          className="cursor-pointer underline sm:no-underline"
         >
           Aryan Naik
         </span>

@@ -53,6 +53,7 @@ const Game = ({ puzzle, sol }) => {
   const difficulties = ["Easy", "Medium", "Hard", "Insane", "Inhuman"];
   const [loading, setLoading] = useState(false)
   const [selectedDifficulty, setSelectedDifficulty] = useState('Easy')
+  const [showShare, setShowShare] = useState(false)
 
   // ---------------- Random Logic ---------------
 
@@ -94,7 +95,9 @@ const Game = ({ puzzle, sol }) => {
     }
   }, [failed, showOptionsFailed]);
 
-
+  const handleShowShare = () => {
+    setShowShare(true)
+  }
 
 
   // ---------------- Player Logic ---------------
@@ -521,20 +524,64 @@ const Game = ({ puzzle, sol }) => {
 
 
   return (
-    <div className='flex justify-center mb-5 h-auto px-0 sm:px-4'>
+    <div className='flex justify-center sm:mb-1 h-auto px-0 sm:px-4'>
+
+      {showShare && (
+        <div
+          className='fixed inset-0 bg-black/50 flex items-center z-50'
+          onClick={(e) => e.target === e.currentTarget && setShowShare(false)}
+        >
+          <div className='w-full mx-5 max-w-[500px] flex flex-col items-center border-2 border-[#b2bfd2] dark:border-[#324465] rounded px-3 py-5 bg-white dark:bg-[#101929] shadow-lg'>
+            <span className='text-2xl inter-bold text-slate-500 dark:text-white'>Share with friends</span>
+
+            <motion.button
+              onClick={handleCopy}
+              className='relative flex items-center justify-center gap-2 duration-200 text-slate-500 dark:text-slate-400 rounded w-full py-2 mt-4 border-[#b2bfd2] dark:border-[#324465] border-[1px] cursor-pointer active:bg-slate-300 dark:active:bg-[#324465] active:text-black dark:active:text-white transition'
+            >
+              <motion.span
+                variants={copyLinkVariants}
+                initial="initial"
+                animate={copied ? "hidden" : "visible"}
+                exit="visible"
+                className='flex items-center gap-2'
+              >
+                <IoIosLink />
+                <span className='inter-regular text-base'>Copy Link</span>
+              </motion.span>
+
+              <motion.span
+                variants={checkIconVariants}
+                initial="initial"
+                animate={copied ? "visible" : "hidden"}
+                exit="hidden"
+                className='absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2'
+              >
+                <FaCheck />
+              </motion.span>
+            </motion.button>
+
+            <span className='w-full text-sm text-slate-500 dark:text-slate-400 inter-regular text-center mt-4 text-wrap'>Share link to play together</span>
+            <div className='mt-4 bg-white p-2 rounded'>
+              <QRCodeCanvas value={multiplayerLink} size={128} bgColor={'#ffffff'} fgColor={'#000000'} />
+            </div>
+            <span className='w-full text-sm text-slate-500 dark:text-slate-400 inter-regular text-center mt-4 text-wrap'>Scan code to join game</span>
+          </div>
+        </div>
+      )}
+
       {/* {won && <ReactConfetti width={window.innerWidth} height={window.innerHeight}/>} */}
-      <div className='w-full max-w-[1228px] rounded-2xl border-0 sm:border-[3px] border-[#e0e5ee] dark:border-[#324465] flex flex-col items-center p-5 sm:shadow-[0_0_30px_rgba(127,205,255,0.6)] sm:dark:shadow-[0_0_30px_rgba(0,255,255,0.2)] bg-white dark:bg-transparent'>
+      <div className='w-full max-w-[1228px] rounded-2xl border-0 sm:border-[3px] border-[#e0e5ee] dark:border-[#324465] flex flex-col items-center p-5 sm:shadow-[0_0_30px_rgba(127,205,255,0.6)] sm:dark:shadow-[0_0_30px_rgba(0,255,255,0.2)] bg-[#FFFADC] sm:bg-white dark:bg-transparent'>
         <div className='flex items-center justify-between w-full mb-3'>
           <div className='flex gap-2 items-center text-lg w-[110px] justify-start'>
             <FaRegCirclePlay
-              className={`text-slate-500 dark:text-slate-400 text-2xl ${failed ? 'cursor-not-allowed pointer-events-none' : 'cursor-pointer hover:scale-110'} duration-200 ${pause ? 'block' : 'hidden'}`}
+              className={`text-slate-500 dark:text-slate-400 text-2xl ${failed ? 'cursor-not-allowed pointer-events-none' : 'cursor-pointer active:scale-110 sm:active:scale-100 hover:scale-110'} duration-200 ${pause ? 'block' : 'hidden'}`}
               onClick={() => {
                 if (failed) return
                 setPause(!pause)
               }}
             />
             <FaRegCirclePause
-              className={`text-slate-500 dark:text-slate-400 text-2xl cursor-pointer hover:scale-110 duration-200 ${pause ? 'hidden' : 'block'}`}
+              className={`text-slate-500 dark:text-slate-400 text-2xl cursor-pointer active-scale-110 sm:active:scale-100 hover:scale-110 duration-200 ${pause ? 'hidden' : 'block'}`}
               onClick={() => {
                 if (failed) return
                 setPause(!pause)
@@ -547,8 +594,8 @@ const Game = ({ puzzle, sol }) => {
             Mistakes: <span className={`font-bold ${mistakes >= 3 ? 'text-red-500' : 'dark:text-white text-black'}`}>{mistakes}/3</span>
           </div>
 
-          <div className='relative text-slate-500 dark:text-slate-400 w-[110px] flex justify-end items-center'>
-            <IoSettingsOutline className='z-10 text-2xl cursor-pointer hover:rotate-[110deg] duration-300'
+          <div className='relative text-slate-500 dark:text-slate-400 w-[110px] flex justify-end items-center z-40'>
+            <IoSettingsOutline className='z-10 text-2xl cursor-pointer active:rotate-[300deg] hover:rotate-[110deg] duration-300'
               onClick={() => setShowSettings(!showSettings)}
             />
             <div className={`${showSettings ? 'block' : 'hidden'} flex flex-col items-center justify-end z-0 absolute top-[-10px] right-[-10px] bg-slate-100 dark:bg-slate-800 border-[0.5px] border-[#e9edf3] dark:border-gray-700 text-base text-slate-500 dark:text-slate-400 rounded px-2 py-1 inter-semibold min-h-21 min-w-[200px]`}>
@@ -571,7 +618,7 @@ const Game = ({ puzzle, sol }) => {
 
         <div className='bg-[#e9edf3] dark:bg-[#324465] w-full h-0.5 dark:h-[1px]' />
 
-        <div className='flex flex-col sm:flex-row items-stretch justify-between gap-4 mt-5 w-full h-[550px]'>
+        <div className='flex flex-col sm:flex-row items-stretch justify-between gap-4 mt-5 w-full flex-grow'>
           <div className='hidden w-full max-w-[20%] sm:flex flex-col items-center border-2 border-[#b2bfd2] dark:border-[#324465] rounded-lg p-2'>
             <span className='text-base inter-regular text-slate-500 dark:text-slate-400'>Share with friends</span>
 
@@ -644,7 +691,7 @@ const Game = ({ puzzle, sol }) => {
                       initial={{ opacity: 0, y: 20 }}
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ duration: 0.5, delay: 0.6, ease: 'easeInOut' }}
-                      className='py-2 px-4 bg-white text-[#31425d] rounded-md inter-medium text-base hover:bg-gray-300 dark:hover:bg-[#465267] dark:hover:text-white transition duration-200'
+                      className='py-2 px-4 bg-white text-[#31425d] rounded-md inter-medium text-base active:bg-gray-300 dark:active:bg-[#465267] hover:bg-gray-300 dark:hover:bg-[#465267] dark:hover:text-white transition duration-200'
                     >
                       New Game
                     </motion.button>
@@ -676,7 +723,7 @@ const Game = ({ puzzle, sol }) => {
 
               {pause && !failed && !won && (
                 <div className='absolute inset-0 z-20 dark:bg-black/70 bg-gray-300 flex items-center justify-center rounded-xl'>
-                  <FaRegCirclePlay onClick={() => {setPause(!pause)}} className='text-8xl text-slate-500 dark:text-slate-400 cursor-pointer' />
+                  <FaRegCirclePlay onClick={() => { setPause(!pause) }} className='text-8xl text-slate-500 dark:text-slate-400 cursor-pointer' />
                 </div>
               )}
 
@@ -701,7 +748,7 @@ const Game = ({ puzzle, sol }) => {
                       ></motion.div>
                     </div>
 
-                    <div className='relative flex items-center justify-center py-[10px] px-3 bg-slate-500 dark:bg-white rounded-md text-white dark:text-[#31425d] inter-medium cursor-pointer hover:bg-gray-300 z-10'>
+                    <div className='relative flex items-center justify-center py-[10px] px-3 bg-slate-500 dark:bg-white rounded-md text-white dark:text-[#31425d] inter-medium cursor-pointer active:bg-gray-300 hover:bg-gray-300 z-10'>
                       Second Chance
                     </div>
                   </div>
@@ -710,7 +757,7 @@ const Game = ({ puzzle, sol }) => {
                     <button
                       ref={buttonRefFailed}
                       onClick={() => setShowOptionsFailed((prev) => !prev)}
-                      className='py-2 px-4 bg-white text-[#31425d] rounded-md inter-medium text-base hover:bg-gray-300 dark:hover:bg-[#465267] dark:hover:text-white transition duration-200'
+                      className='py-2 px-4 bg-white text-[#31425d] rounded-md inter-medium text-base active:bg-gray-300 dark:active:bg-[#465267] hover:bg-gray-300 dark:hover:bg-[#465267] dark:hover:text-white transition duration-200'
                     >
                       New Game
                     </button>
@@ -763,7 +810,7 @@ const Game = ({ puzzle, sol }) => {
                   } else if (isSelected) {
                     bgColor = 'bg-[#c8d8fa] dark:bg-[#1b2131]';
                   } else {
-                    bgColor = 'bg-white dark:bg-[#020817] caret-transparent';
+                    bgColor = 'bg-white dark:bg-black sm:dark:bg-[#020817] caret-transparent';
                   }
 
                   return (
@@ -798,17 +845,81 @@ const Game = ({ puzzle, sol }) => {
             </div>
           </div>
 
-          <div className='w-full h-full flex flex-col items-center justify-between gap-3'>
+          <div className='w-full h-full flex flex-col items-center flex-grow gap-3'>
 
-            <div className='w-full h-full order-1 sm:order-none'>
-              <ChatBox roomId={sessionId} playersList={playersList} />
+            <div className='w-full h-full order-2 sm:order-none flex flex-col'>
+              <ChatBox roomId={sessionId} playersList={playersList} handleShowShare={handleShowShare} />
             </div>
 
-            <div className='grid grid-cols-10 sm:grid-cols-5 w-full gap-1 sm:gap-2'>
+            <div className='flex sm:hidden order-1 items-center justify-center w-full gap-7 mt-1 mb-5'>
+              <button
+                onClick={() => {
+                  if (undoStack.length === 0) return
+
+                  const prevState = undoStack[undoStack.length - 1];
+                  setUndoStack(prev => prev.slice(0, -1));
+                  setRedoStack(prev => [...prev, { userGrid: [...userGrid], notesGrid: notesGrid.map(set => new Set(set)) }]);
+
+                  setUserGrid(prevState.userGrid);
+                  setNotesGrid(prevState.notesGrid);
+                }}
+                className={`flex w-12 aspect-square items-center justify-center rounded-xl text-2xl bg-[#f1f5f9] dark:bg-transparent border-2 border-[#324465] dark:text-gray-500 text-black ${pause ? '' : 'active:border-[#152237] active:bg-slate-300 dark:active:bg-[#152237] duration-200 dark:active:text-white transition'}`}
+              >
+                <RiArrowGoBackLine />
+              </button>
+
+              <button
+                onClick={() => {
+                  if (redoStack.length === 0) return
+
+                  const nextState = redoStack[redoStack.length - 1];
+                  setRedoStack(prev => prev.slice(0, -1));
+                  setUndoStack(prev => [...prev, { userGrid: [...userGrid], notesGrid: notesGrid.map(set => new Set(set)) }]);
+
+                  setUserGrid(nextState.userGrid);
+                  setNotesGrid(nextState.notesGrid);
+                }}
+                className={`flex w-12 aspect-square items-center justify-center rounded-xl text-2xl bg-[#f1f5f9] dark:bg-transparent border-2 border-[#324465] dark:text-gray-500 text-black ${pause ? '' : 'active:border-[#152237] active:bg-slate-300 dark:active:bg-[#152237] duration-200 dark:active:text-white transition'}`}
+              >
+                <RiArrowGoForwardLine />
+              </button>
+
+              <button
+                onClick={() => setPenMode(prev => !prev)}
+                className='relative flex w-12 aspect-square items-center justify-center rounded-xl text-2xl bg-[#f1f5f9] dark:bg-transparent border-2 border-[#324465] active:border-[#152237] dark:text-gray-500 text-black active:bg-slate-300 dark:active:bg-[#152237] duration-200 dark:active:text-white transition'
+              >
+                <div className={`absolute top-[-10px] right-[-10px] bg-gray-600 ${penMode ? 'text-green-300' : 'text-slate-300'} text-xs rounded-full px-2 py-1 inter-semibold`}>
+                  {penMode ? 'On' : 'Off'}
+                </div>
+                <LuPencilLine />
+              </button>
+
+              <button
+                onClick={() => {
+                  if (pause || selectedCell === null) return
+
+                  saveState();
+
+                  const updatedGrid = [...userGrid];
+                  updatedGrid[selectedCell] = null;
+
+                  const updatedNotes = [...notesGrid];
+                  updatedNotes[selectedCell] = new Set();
+
+                  setUserGrid(updatedGrid);
+                  setNotesGrid(updatedNotes);
+                }}
+                className={`flex w-12 aspect-square items-center justify-center rounded-xl text-2xl bg-[#f1f5f9] dark:bg-transparent border-2 border-[#324465] dark:text-gray-500 text-black ${pause ? '' : 'active:border-[#152237] active:bg-slate-300 dark:active:bg-[#152237] duration-200 dark:active:text-white transition'}`}
+              >
+                <FaBackspace className='text-lg sm:text-2xl mr-[1px]' />
+              </button>
+            </div>
+
+            <div className='grid grid-cols-9 sm:grid-cols-5 w-full gap-1 sm:gap-2'>
               {[...Array(9)].map((_, i) => (
                 <button
                   key={i + 1}
-                  className={`w-full aspect-square p-1 sm:py-3 bg-slate-300 dark:bg-[#020817] sm:dark:bg-[#152237] dark:text-gray-200 sm:dark:text-gray-500 border-[1px] sm:border-0 border-slate-700 text-black rounded text-base sm:text-xl font-semibold ${pause ? '' : 'hover:bg-slate-400 dark:hover:bg-[#101929] duration-200 dark:hover:text-white transition'}`}
+                  className={`w-full aspect-square p-1 sm:py-3 bg-slate-300 dark:bg-[#020817] sm:dark:bg-[#152237] dark:text-gray-200 sm:dark:text-gray-500 border-[1px] sm:border-0 border-slate-700 text-black rounded text-base sm:text-xl font-semibold ${pause ? '' : 'active:bg-slate-400 hover:bg-slate-400 dark:active:bg-[#101929] dark:hover:bg-[#101929] duration-200 dark:active:text-white dark:hover:text-white transition'}`}
                   onClick={() => {
                     if (pause || selectedCell === null) return
 
@@ -844,7 +955,7 @@ const Game = ({ puzzle, sol }) => {
                 </button>
               ))}
               <button
-                className={`w-full p-1 sm:py-3 bg-slate-300 dark:bg-[#020817] sm:dark:bg-[#152237] dark:text-gray-200 sm:dark:text-gray-500 border-[1px] sm:border-0 border-slate-700 text-black rounded text-sm sm:text-xl font-semibold ${pause ? '' : 'hover:bg-slate-400 dark:hover:bg-[#101929] duration-200 dark:hover:text-white transition'} flex items-center justify-center`}
+                className={`w-full p-1 sm:py-3 bg-slate-300 dark:bg-[#020817] sm:dark:bg-[#152237] dark:text-gray-200 sm:dark:text-gray-500 border-[1px] sm:border-0 border-slate-700 text-black rounded text-sm sm:text-xl font-semibold ${pause ? '' : 'hover:bg-slate-400 dark:hover:bg-[#101929] duration-200 dark:hover:text-white transition'} hidden sm:flex items-center justify-center`}
                 onClick={() => {
                   if (pause || selectedCell === null) return
 
@@ -867,7 +978,7 @@ const Game = ({ puzzle, sol }) => {
           </div>
         </div>
 
-        <div className='flex items-center justify-center w-full gap-32 mt-5'>
+        <div className='hidden sm:flex items-center justify-center w-full gap-32 mt-5'>
           <button
             onClick={() => {
               if (undoStack.length === 0) return

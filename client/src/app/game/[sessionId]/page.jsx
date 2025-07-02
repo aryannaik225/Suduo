@@ -120,13 +120,14 @@ export default function Home() {
     )
   }
   return (
-    <div className='relative w-screen h-auto min-h-screen'>
+    <div className='flex flex-col min-h-screen w-screen'>
       <ToastContainer />
       <NavBar theme={theme} setTheme={setTheme} />
-      <Game puzzle={puzzle} sol={solution} />
-      <div className='w-screen h-auto'>
-        <FooterForGame />
+      <div className='flex-grow'>
+        <Game puzzle={puzzle} sol={solution} />
       </div>
+      <FooterForGame />
+
     </div>
   )
 }

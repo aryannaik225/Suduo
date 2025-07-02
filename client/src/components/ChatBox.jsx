@@ -5,7 +5,7 @@ import Pusher from 'pusher-js'
 import React, { useRef, useState, useEffect } from 'react'
 import { IoSend } from 'react-icons/io5'
 
-const ChatBox = ({ roomId, playersList = [] }) => {
+const ChatBox = ({ roomId, playersList = [], handleShowShare }) => {
 
   const [messages, setMessages] = useState([])
   const [input, setInput] = useState('')
@@ -71,21 +71,9 @@ const ChatBox = ({ roomId, playersList = [] }) => {
   };
 
   return (
-    <div className='h-full w-full rounded border-[2px] border-[#b2bfd2] dark:border-[#324465] flex flex-col pb-3 bg-[#f1f1f2] dark:bg-[#0a162f]'>
+    <div className='min-h-96 h-full w-full rounded border-[2px] border-[#b2bfd2] dark:border-[#324465] flex flex-col pb-3 bg-[#f1f1f2] dark:bg-[#0a162f]'>
 
-      <div className='flex items-center justify-end p-3 w-full flex-wrap gap-3'>
-        {/* <div className='relative group'>
-          <Image
-            width={30}
-            height={30}
-            src='/profile_avatars/pfp1.svg'
-            alt='profile avatar'
-            className='rounded-full outline-[3px] outline-blue-400 outline-offset-2'
-          />
-          <span className='absolute bottom-full mb-2 left-1/2 -translate-x-1/2 bg-gray-800 text-white text-sm px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200 whitespace-nowrap z-10'>
-            Aryan
-          </span>
-        </div> */}
+      <div className='hidden sm:flex items-center justify-end p-3 w-full flex-wrap gap-[14px] sm:gap-3'>
         {playersList.map((player, idx) => (
           <div key={idx} className='relative group'>
             <Image
@@ -102,10 +90,36 @@ const ChatBox = ({ roomId, playersList = [] }) => {
         ))}
       </div>
 
+      <div className='flex sm:hidden items-center justify-between px-3'>
+        <button 
+          className='flex items-center text-sm py-2 px-5 text-slate-700 dark:text-slate-300 bg-slate-300 dark:bg-[#020817] rounded active:bg-[#b2bfd2] dark:active:bg-[#324465] duration-200'
+          onClick={handleShowShare}
+          title='Share this room with others'
+        >
+          Invite
+        </button>
+        <div className='flex sm:hidden items-center justify-end p-3 w-full gap-[14px] sm:gap-3'>
+          {playersList.map((player, idx) => (
+            <div key={idx} className='relative group'>
+              <Image
+                width={30}
+                height={30}
+                src={avatarMap.get(player.username) || '/profile_avatars/pfp1.svg'}
+                alt='profile avatar'
+                className='rounded-full outline-[3px] outline-blue-400 outline-offset-2'
+              />
+              <span className='absolute bottom-full mb-2 left-1/2 -translate-x-1/2 bg-slate-300 text-slate-800 dark:bg-gray-800 dark:text-white text-sm px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200 whitespace-nowrap z-10'>
+                {player.username}
+              </span>
+            </div>
+          ))}
+        </div>
+      </div>
+
       <div className='w-full h-[1px] bg-[#b2bfd2] dark:bg-[#324465]' />
 
       {/* Messages */}
-      <div className='flex justify-start overflow-y-scroll h-full max-h-[280px] p-3 no-scrollbar flex-col w-full'>
+      <div className='flex justify-start overflow-y-scroll p-3 no-scrollbar flex-col w-full flex-1'>
         {messages.map((msg, idx) => (
           <div key={idx} className={`flex mb-3 ${msg.username === username ? 'justify-end' : 'justify-start'}`}>
             <div className={`flex items-center gap-2 ${msg.username === username ? 'flex-row-reverse' : ''}`}>
@@ -138,7 +152,7 @@ const ChatBox = ({ roomId, playersList = [] }) => {
         />
         <button
           onClick={handleSend}
-          className='bg-[#d7dae0] dark:bg-[#324465] text-white px-4 rounded-lg hover:bg-[#b2bfd2] dark:hover:bg-[#415a89] duration-200 flex items-center justify-center'
+          className='bg-[#d7dae0] dark:bg-[#324465] text-white px-4 rounded-lg active:bg-[#b2f2d2] sm:active:bg-[#d7dae0] hover:bg-[#b2bfd2] dark:active:bg-[#415a89] dark:hover:bg-[#415a89] sm:dark:active:bg-[#324465] duration-200 flex items-center justify-center'
         >
           <IoSend className="text-xl" />
         </button>
