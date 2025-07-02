@@ -6,8 +6,19 @@ import fs from "fs";
 let db;
 
 if (!getApps().length) {
-  const serviceAccountPath = path.join(process.cwd(), "src/firebase/suduo-realtime-firebase-adminsdk-fbsvc-49ee1cf9dd.json");
-  const serviceAccount = JSON.parse(fs.readFileSync(serviceAccountPath, "utf-8"));
+  let serviceAccount;
+
+  if (process.env.FIREBASE_ADMIN_JSON) {
+    serviceAccount = JSON.parse(process.env.FIREBASE_ADMIN_JSON);
+    console.log("[Init] Loaded Firebase Admin credentials from ENV");
+  } else {
+    const serviceAccountPath = path.join(
+      process.cwd(),
+      "src/firebase/suduo-realtime-firebase-adminsdk-fbsvc-49ee1cf9dd.json"
+    );
+    serviceAccount = JSON.parse(fs.readFileSync(serviceAccountPath, "utf-8"));
+    console.log("[Init] Loaded Firebase Admin credentials from local JSON");
+  }
 
   initializeApp({
     credential: cert(serviceAccount),
@@ -45,7 +56,7 @@ export async function POST(req) {
       if (player.id === playerId) {
         return {
           ...player,
-          maybeLeftAt: now // <-- ✅ MARK PLAYER AS "MAYBE LEFT"
+          maybeLeftAt: now
         };
       }
       return player;
@@ -55,7 +66,6 @@ export async function POST(req) {
 
     console.log(`[Beacon] Player ${playerId} marked as maybe left at ${now}`);
 
-    // 🕒 Wait 8 seconds before cleanup
     setTimeout(async () => {
       const latestSnap = await sessionRef.get();
       const latestData = latestSnap.data();
@@ -64,7 +74,7 @@ export async function POST(req) {
       if (!latestData?.players) return;
 
       const cleanedPlayers = latestData.players.filter(player => {
-        // ✅ REMOVE if maybeLeftAt was set and it's older than 8s ago
+
         if (player.maybeLeftAt && now - player.maybeLeftAt > 8000) {
           return false;
         }
