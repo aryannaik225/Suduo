@@ -39,29 +39,50 @@ export async function POST(req) {
     }
 
     const data = sessionSnap.data();
-    const updatedPlayers = (data.players || []).filter(p => p.id !== playerId);
+    const now = Date.now();
+
+    const updatedPlayers = (data.players || []).map(player => {
+      if (player.id === playerId) {
+        return {
+          ...player,
+          maybeLeftAt: now // <-- ✅ MARK PLAYER AS "MAYBE LEFT"
+        };
+      }
+      return player;
+    });
 
     await sessionRef.update({ players: updatedPlayers });
 
-    console.log(`[Beacon] Player ${playerId} removed from session ${sessionId}`);
+    console.log(`[Beacon] Player ${playerId} marked as maybe left at ${now}`);
 
-    if (updatedPlayers.length === 0) {
-      console.log(`[Beacon] No players left. Waiting 8secs to confirm before deleting session ${sessionId}`)
+    // 🕒 Wait 8 seconds before cleanup
+    setTimeout(async () => {
+      const latestSnap = await sessionRef.get();
+      const latestData = latestSnap.data();
+      const now = Date.now();
 
-      setTimeout(async () => {
-        const latestSnap = await sessionRef.get()
-        const latestData = latestSnap.data()
+      if (!latestData?.players) return;
 
-        if (!latestData?.players || latestData.players.length === 0) {
-          await sessionRef.delete()
-          console.log(`[Beacon] Session ${sessionId} deleted due to inactivity.`)
-        } else {
-          console.log(`[Beacon] Session ${sessionId} still has players. Not deleting.`);
+      const cleanedPlayers = latestData.players.filter(player => {
+        // ✅ REMOVE if maybeLeftAt was set and it's older than 8s ago
+        if (player.maybeLeftAt && now - player.maybeLeftAt > 8000) {
+          return false;
         }
-      }, 8000)
-    }
+        return true;
+      });
 
-    return new Response("Player removed", { status: 200 });
+      await sessionRef.update({ players: cleanedPlayers });
+
+      console.log(`[Beacon] Final cleaned players list:`, cleanedPlayers.map(p => p.id));
+
+      if (cleanedPlayers.length === 0) {
+        await sessionRef.delete();
+        console.log(`[Beacon] Session ${sessionId} deleted due to inactivity.`);
+      }
+
+    }, 8000);
+
+    return new Response("Player marked as maybe left", { status: 200 });
   } catch (error) {
     console.error("Error in leave cleanup:", error);
     return new Response("Internal server error", { status: 500 });

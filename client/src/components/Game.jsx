@@ -54,6 +54,7 @@ const Game = ({ puzzle, sol }) => {
   const [loading, setLoading] = useState(false)
   const [selectedDifficulty, setSelectedDifficulty] = useState('Easy')
   const [showShare, setShowShare] = useState(false)
+  const playerIdRef = useRef(null)
 
   // ---------------- Random Logic ---------------
 
@@ -421,19 +422,28 @@ const Game = ({ puzzle, sol }) => {
   // ---------------- Players Leave Logic ---------------
 
   const cleanupBeforeUnload = () => {
-    const playerData = localStorage.getItem('playerData');
-    const hostData = localStorage.getItem('hostData');
-    const leavingPlayerId = playerData ? JSON.parse(playerData).playerId : hostData ? JSON.parse(hostData).hostId : null;
+    const playerId = playerIdRef.current;
 
-    if (!leavingPlayerId || !sessionId) return;
+    if (!playerId || !sessionId) return;
 
     const blob = new Blob(
-      [JSON.stringify({ sessionId, playerId: leavingPlayerId })],
+      [JSON.stringify({ sessionId, playerId })],
       { type: 'application/json' }
-    )
+    );
 
     navigator.sendBeacon('/api/leave-session', blob);
-  }
+  };
+
+
+  useEffect(() => {
+    const playerData = localStorage.getItem('playerData');
+    const hostData = localStorage.getItem('hostData');
+
+    const leavingPlayerId = playerData ? JSON.parse(playerData).playerId : hostData ? JSON.parse(hostData).hostId : null;
+
+    playerIdRef.current = leavingPlayerId;
+  }, [])
+
 
   useEffect(() => {
     const handleBeforeUnload = (e) => {
