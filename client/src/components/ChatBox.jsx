@@ -17,13 +17,20 @@ const ChatBox = ({ roomId, playersList = [], handleShowShare }) => {
   const sanitizedRoomId = roomId.replace(/\s+/g, '-');
 
   useEffect(() => {
-    const data = localStorage.getItem('hostData') || localStorage.getItem('playerData');
-    if (data) {
-      const { playerUsername, hostUsername, playerPfp, hostPfp } = JSON.parse(data);
-      setUsername(playerUsername || hostUsername);
-      setPfp(playerPfp || hostPfp);
+    const playerData = localStorage.getItem('playerData');
+    const hostData = localStorage.getItem('hostData');
+
+    if (playerData) {
+      const { playerUsername, playerPfp } = JSON.parse(playerData);
+      setUsername(playerUsername);
+      setPfp(playerPfp || '/profile_avatars/pfp1.svg');
+    } else if (hostData) {
+      const { hostUsername, hostPfp } = JSON.parse(hostData);
+      setUsername(hostUsername);
+      setPfp(hostPfp || '/profile_avatars/pfp1.svg');
     }
   }, []);
+
 
 
   useEffect(() => {
@@ -71,7 +78,7 @@ const ChatBox = ({ roomId, playersList = [], handleShowShare }) => {
   };
 
   return (
-    <div className='min-h-96 h-full w-full rounded border-[2px] border-[#b2bfd2] dark:border-[#324465] flex flex-col pb-3 bg-[#f1f1f2] dark:bg-[#0a162f]'>
+    <div className='h-[400px] no-scrollbar w-full rounded border-[2px] border-[#b2bfd2] dark:border-[#324465] flex flex-col pb-3 bg-[#f1f1f2] dark:bg-[#0a162f]'>
 
       <div className='hidden xl:flex items-center justify-end p-3 w-full flex-wrap gap-[14px] sm:gap-3'>
         {playersList.map((player, idx) => (
@@ -91,7 +98,7 @@ const ChatBox = ({ roomId, playersList = [], handleShowShare }) => {
       </div>
 
       <div className='flex xl:hidden items-center justify-between px-3'>
-        <button 
+        <button
           className='flex items-center text-sm py-2 px-5 text-slate-700 dark:text-slate-300 bg-slate-300 dark:bg-[#020817] rounded active:bg-[#b2bfd2] dark:active:bg-[#324465] duration-200'
           onClick={handleShowShare}
           title='Share this room with others'
