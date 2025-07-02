@@ -73,7 +73,7 @@ const ChatBox = ({ roomId, playersList = [], handleShowShare }) => {
   return (
     <div className='min-h-96 h-full w-full rounded border-[2px] border-[#b2bfd2] dark:border-[#324465] flex flex-col pb-3 bg-[#f1f1f2] dark:bg-[#0a162f]'>
 
-      <div className='hidden sm:flex items-center justify-end p-3 w-full flex-wrap gap-[14px] sm:gap-3'>
+      <div className='hidden xl:flex items-center justify-end p-3 w-full flex-wrap gap-[14px] sm:gap-3'>
         {playersList.map((player, idx) => (
           <div key={idx} className='relative group'>
             <Image
@@ -90,7 +90,7 @@ const ChatBox = ({ roomId, playersList = [], handleShowShare }) => {
         ))}
       </div>
 
-      <div className='flex sm:hidden items-center justify-between px-3'>
+      <div className='flex xl:hidden items-center justify-between px-3'>
         <button 
           className='flex items-center text-sm py-2 px-5 text-slate-700 dark:text-slate-300 bg-slate-300 dark:bg-[#020817] rounded active:bg-[#b2bfd2] dark:active:bg-[#324465] duration-200'
           onClick={handleShowShare}
@@ -98,7 +98,7 @@ const ChatBox = ({ roomId, playersList = [], handleShowShare }) => {
         >
           Invite
         </button>
-        <div className='flex sm:hidden items-center justify-end p-3 w-full gap-[14px] sm:gap-3'>
+        <div className='flex xl:hidden items-center justify-end p-3 w-full gap-[14px] sm:gap-3'>
           {playersList.map((player, idx) => (
             <div key={idx} className='relative group'>
               <Image
@@ -141,20 +141,20 @@ const ChatBox = ({ roomId, playersList = [], handleShowShare }) => {
       </div>
 
       {/* Input */}
-      <div className='flex gap-2 px-3 pt-3'>
+      <div className='flex items-center gap-2 px-3 pt-3 w-full max-w-full'>
         <input
           type="text"
           placeholder="Message"
           value={input}
           onChange={(e) => setInput(e.target.value)}
           onKeyDown={handleKeyPress}
-          className="flex-1 bg-[#d7dae0] dark:bg-[#152237] text-[#1f1f1f] dark:text-white px-3 py-2 rounded-lg outline-none border border-[#b2bfd2] dark:border-[#324465] placeholder:text-slate-500 dark:placeholder:text-slate-400 text-[15px]"
+          className="min-w-0 flex-1 bg-[#d7dae0] dark:bg-[#152237] text-[#1f1f1f] dark:text-white px-3 py-2 rounded-lg outline-none border border-[#b2bfd2] dark:border-[#324465] placeholder:text-slate-500 dark:placeholder:text-slate-400 text-[15px]"
         />
         <button
           onClick={handleSend}
-          className='bg-[#d7dae0] dark:bg-[#324465] text-white px-4 rounded-lg active:bg-[#b2f2d2] sm:active:bg-[#d7dae0] hover:bg-[#b2bfd2] dark:active:bg-[#415a89] dark:hover:bg-[#415a89] sm:dark:active:bg-[#324465] duration-200 flex items-center justify-center'
+          className='shrink-0 bg-[#d7dae0] dark:bg-[#324465] text-white px-3 sm:px-4 py-2 rounded-lg active:bg-[#b2f2d2] sm:active:bg-[#d7dae0] hover:bg-[#b2bfd2] dark:active:bg-[#415a89] dark:hover:bg-[#415a89] sm:dark:active:bg-[#324465] duration-200 flex items-center justify-center'
         >
-          <IoSend className="text-xl" />
+          <IoSend className="text-base sm:text-xl" />
         </button>
       </div>
     </div>

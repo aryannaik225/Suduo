@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { ToastContainer } from 'react-toastify';
 import { FaSpinner } from 'react-icons/fa';
+import { LuCircleDashed } from "react-icons/lu";
 import { SiTicktick } from "react-icons/si";
 import { useRouter } from 'next/navigation';
 import { v4 as uuidv4 } from 'uuid';
@@ -10,6 +11,7 @@ import axios from 'axios';
 import { nanoid } from 'nanoid';
 import { createSession } from '@/firebase/firestoreUtils';
 import Footer from '@/components/Footer';
+import FooterForGame from '@/components/FooterForGame';
 
 const difficulties = ['Easy', 'Medium', 'Hard', 'Insane', 'Inhuman']
 
@@ -133,14 +135,16 @@ export default function Home() {
 
 
   return (
-    <div className='relative w-screen h-screen overflow-hidden flex justify-center items-center'>
+    <div className='relative w-screen min-h-screen overflow-hidden flex flex-col justify-between items-center py-3 px-4 sm:px-6 lg:px-8'>
 
       <div className="absolute inset-0 z-0 opacity-20 bg-[url('/sudoku-bg-dark.svg')] dark:bg-[url('/sudoku-bg.svg')] bg-center bg-cover blur-sm"></div>
 
+      <div></div>
 
-      <div className='relative z-10 flex flex-col items-center min-h-10 w-80'>
 
-        <div className='text-3xl poppins-semibold text-black dark:text-white mb-5' onClick={() => setTheme(prev => prev === 'dark' ? 'light' : 'dark')}>
+      <div className='relative z-10 flex flex-col items-center w-full max-w-80'>
+
+        <div className='text-2xl sm:text-3xl lg:text-4xl poppins-semibold text-black dark:text-white mb-5' onClick={() => setTheme(prev => prev === 'dark' ? 'light' : 'dark')}>
           Select Difficulty
         </div>
 
@@ -183,7 +187,7 @@ export default function Home() {
           {loading
             ? ready
               ? <><SiTicktick className='mr-2' />Game Ready</>
-              : <><FaSpinner className='animate-spin mr-2' /> Creating Game</>
+              : <><LuCircleDashed className='animate-spin mr-2' /> Creating Game</>
             : 'Start Game'
           }
         </button>
@@ -191,7 +195,8 @@ export default function Home() {
         <ToastContainer />
 
       </div>
-      <Footer />
+      {/* <Footer /> */}
+      <FooterForGame />
     </div>
 
   );

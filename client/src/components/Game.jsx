@@ -528,7 +528,7 @@ const Game = ({ puzzle, sol }) => {
 
       {showShare && (
         <div
-          className='fixed inset-0 bg-black/50 flex items-center z-50'
+          className='fixed inset-0 bg-black/50 flex justify-center items-center z-50'
           onClick={(e) => e.target === e.currentTarget && setShowShare(false)}
         >
           <div className='w-full mx-5 max-w-[500px] flex flex-col items-center border-2 border-[#b2bfd2] dark:border-[#324465] rounded px-3 py-5 bg-white dark:bg-[#101929] shadow-lg'>
@@ -570,27 +570,27 @@ const Game = ({ puzzle, sol }) => {
       )}
 
       {/* {won && <ReactConfetti width={window.innerWidth} height={window.innerHeight}/>} */}
-      <div className='w-full max-w-[1228px] rounded-2xl border-0 sm:border-[3px] border-[#e0e5ee] dark:border-[#324465] flex flex-col items-center p-5 sm:shadow-[0_0_30px_rgba(127,205,255,0.6)] sm:dark:shadow-[0_0_30px_rgba(0,255,255,0.2)] bg-[#FFFADC] sm:bg-white dark:bg-transparent'>
+      <div className='w-full max-w-[1228px] rounded-2xl border-0 lg:border-[3px] border-[#e0e5ee] dark:border-[#324465] flex flex-col items-center p-5 lg:shadow-[0_0_30px_rgba(127,205,255,0.6)] lg:dark:shadow-[0_0_30px_rgba(0,255,255,0.2)] bg-[#FFFADC] sm:bg-white dark:bg-transparent'>
         <div className='flex items-center justify-between w-full mb-3'>
           <div className='flex gap-2 items-center text-lg w-[110px] justify-start'>
             <FaRegCirclePlay
-              className={`text-slate-500 dark:text-slate-400 text-2xl ${failed ? 'cursor-not-allowed pointer-events-none' : 'cursor-pointer active:scale-110 sm:active:scale-100 hover:scale-110'} duration-200 ${pause ? 'block' : 'hidden'}`}
+              className={`text-slate-500 dark:text-slate-400 text-lg sm:text-2xl ${failed ? 'cursor-not-allowed pointer-events-none' : 'cursor-pointer active:scale-110 sm:active:scale-100 hover:scale-110'} duration-200 ${pause ? 'block' : 'hidden'}`}
               onClick={() => {
                 if (failed) return
                 setPause(!pause)
               }}
             />
             <FaRegCirclePause
-              className={`text-slate-500 dark:text-slate-400 text-2xl cursor-pointer active-scale-110 sm:active:scale-100 hover:scale-110 duration-200 ${pause ? 'hidden' : 'block'}`}
+              className={`text-slate-500 dark:text-slate-400 text-lg sm:text-2xl cursor-pointer active-scale-110 sm:active:scale-100 hover:scale-110 duration-200 ${pause ? 'hidden' : 'block'}`}
               onClick={() => {
                 if (failed) return
                 setPause(!pause)
               }}
             />
-            <span className={`${showTimer ? 'opacity-100' : 'opacity-0'} text-slate-500 dark:text-slate-400 inter-semibold text-base`}>{formatTime(timeInSeconds)}</span>
+            <span className={`${showTimer ? 'opacity-100' : 'opacity-0'} text-slate-500 dark:text-slate-400 inter-semibold text-sm sm:text-base`}>{formatTime(timeInSeconds)}</span>
           </div>
 
-          <div className='text-slate-500 dark:text-slate-400 inter-medium text-base w-[110px] flex justify-center items-center'>
+          <div className='text-slate-500 dark:text-slate-400 inter-medium text-sm sm:text-base w-[110px] flex justify-center items-center'>
             Mistakes: <span className={`font-bold ${mistakes >= 3 ? 'text-red-500' : 'dark:text-white text-black'}`}>{mistakes}/3</span>
           </div>
 
@@ -618,8 +618,8 @@ const Game = ({ puzzle, sol }) => {
 
         <div className='bg-[#e9edf3] dark:bg-[#324465] w-full h-0.5 dark:h-[1px]' />
 
-        <div className='flex flex-col sm:flex-row items-stretch justify-between gap-4 mt-5 w-full flex-grow'>
-          <div className='hidden w-full max-w-[20%] sm:flex flex-col items-center border-2 border-[#b2bfd2] dark:border-[#324465] rounded-lg p-2'>
+        <div className='flex flex-col lg:flex-row items-stretch justify-between gap-4 mt-5 w-full flex-grow'>
+          <div className='hidden w-full max-w-[20%] xl:flex flex-col items-center border-2 border-[#b2bfd2] dark:border-[#324465] rounded-lg p-2'>
             <span className='text-base inter-regular text-slate-500 dark:text-slate-400'>Share with friends</span>
 
             <motion.button
@@ -655,7 +655,7 @@ const Game = ({ puzzle, sol }) => {
             <span className='w-full text-sm text-slate-500 dark:text-slate-400 inter-regular text-center mt-4 text-wrap'>Scan code to join game</span>
           </div>
 
-          <div className='w-full sm:max-w-[65%] max-h-full' ref={confettiRef}>
+          <div className='w-full lg:max-w-[65%] max-h-full' ref={confettiRef}>
             <div className='relative h-full w-full'>
 
               {won && (
@@ -847,11 +847,11 @@ const Game = ({ puzzle, sol }) => {
 
           <div className='w-full h-full flex flex-col items-center flex-grow gap-3'>
 
-            <div className='w-full h-full order-2 sm:order-none flex flex-col'>
+            <div className='w-full h-full order-2 lg:order-none flex flex-col'>
               <ChatBox roomId={sessionId} playersList={playersList} handleShowShare={handleShowShare} />
             </div>
 
-            <div className='flex sm:hidden order-1 items-center justify-center w-full gap-7 mt-1 mb-5'>
+            <div className='flex lg:hidden order-1 items-center justify-center w-full gap-7 mt-1 mb-5'>
               <button
                 onClick={() => {
                   if (undoStack.length === 0) return
@@ -863,7 +863,7 @@ const Game = ({ puzzle, sol }) => {
                   setUserGrid(prevState.userGrid);
                   setNotesGrid(prevState.notesGrid);
                 }}
-                className={`flex w-12 aspect-square items-center justify-center rounded-xl text-2xl bg-[#f1f5f9] dark:bg-transparent border-2 border-[#324465] dark:text-gray-500 text-black ${pause ? '' : 'active:border-[#152237] active:bg-slate-300 dark:active:bg-[#152237] duration-200 dark:active:text-white transition'}`}
+                className={`flex w-12 md:w-16 aspect-square items-center justify-center rounded-xl text-2xl bg-[#f1f5f9] dark:bg-transparent border-2 border-[#324465] dark:text-gray-500 text-black ${pause ? '' : 'active:border-[#152237] active:bg-slate-300 dark:active:bg-[#152237] duration-200 dark:active:text-white transition'}`}
               >
                 <RiArrowGoBackLine />
               </button>
@@ -879,14 +879,14 @@ const Game = ({ puzzle, sol }) => {
                   setUserGrid(nextState.userGrid);
                   setNotesGrid(nextState.notesGrid);
                 }}
-                className={`flex w-12 aspect-square items-center justify-center rounded-xl text-2xl bg-[#f1f5f9] dark:bg-transparent border-2 border-[#324465] dark:text-gray-500 text-black ${pause ? '' : 'active:border-[#152237] active:bg-slate-300 dark:active:bg-[#152237] duration-200 dark:active:text-white transition'}`}
+                className={`flex w-12 md:w-16 aspect-square items-center justify-center rounded-xl text-2xl bg-[#f1f5f9] dark:bg-transparent border-2 border-[#324465] dark:text-gray-500 text-black ${pause ? '' : 'active:border-[#152237] active:bg-slate-300 dark:active:bg-[#152237] duration-200 dark:active:text-white transition'}`}
               >
                 <RiArrowGoForwardLine />
               </button>
 
               <button
                 onClick={() => setPenMode(prev => !prev)}
-                className='relative flex w-12 aspect-square items-center justify-center rounded-xl text-2xl bg-[#f1f5f9] dark:bg-transparent border-2 border-[#324465] active:border-[#152237] dark:text-gray-500 text-black active:bg-slate-300 dark:active:bg-[#152237] duration-200 dark:active:text-white transition'
+                className='relative flex w-12 md:w-16 aspect-square items-center justify-center rounded-xl text-2xl bg-[#f1f5f9] dark:bg-transparent border-2 border-[#324465] active:border-[#152237] dark:text-gray-500 text-black active:bg-slate-300 dark:active:bg-[#152237] duration-200 dark:active:text-white transition'
               >
                 <div className={`absolute top-[-10px] right-[-10px] bg-gray-600 ${penMode ? 'text-green-300' : 'text-slate-300'} text-xs rounded-full px-2 py-1 inter-semibold`}>
                   {penMode ? 'On' : 'Off'}
@@ -909,17 +909,17 @@ const Game = ({ puzzle, sol }) => {
                   setUserGrid(updatedGrid);
                   setNotesGrid(updatedNotes);
                 }}
-                className={`flex w-12 aspect-square items-center justify-center rounded-xl text-2xl bg-[#f1f5f9] dark:bg-transparent border-2 border-[#324465] dark:text-gray-500 text-black ${pause ? '' : 'active:border-[#152237] active:bg-slate-300 dark:active:bg-[#152237] duration-200 dark:active:text-white transition'}`}
+                className={`flex w-12 md:w-16 aspect-square items-center justify-center rounded-xl text-2xl bg-[#f1f5f9] dark:bg-transparent border-2 border-[#324465] dark:text-gray-500 text-black ${pause ? '' : 'active:border-[#152237] active:bg-slate-300 dark:active:bg-[#152237] duration-200 dark:active:text-white transition'}`}
               >
                 <FaBackspace className='text-lg sm:text-2xl mr-[1px]' />
               </button>
             </div>
 
-            <div className='grid grid-cols-9 sm:grid-cols-5 w-full gap-1 sm:gap-2'>
+            <div className='grid grid-cols-9 lg:grid-cols-5 w-full gap-1 sm:gap-2'>
               {[...Array(9)].map((_, i) => (
                 <button
                   key={i + 1}
-                  className={`w-full aspect-square p-1 sm:py-3 bg-slate-300 dark:bg-[#020817] sm:dark:bg-[#152237] dark:text-gray-200 sm:dark:text-gray-500 border-[1px] sm:border-0 border-slate-700 text-black rounded text-base sm:text-xl font-semibold ${pause ? '' : 'active:bg-slate-400 hover:bg-slate-400 dark:active:bg-[#101929] dark:hover:bg-[#101929] duration-200 dark:active:text-white dark:hover:text-white transition'}`}
+                  className={`w-full aspect-square p-1 lg:py-3 bg-slate-300 dark:bg-[#020817] lg:dark:bg-[#152237] dark:text-gray-200 lg:dark:text-gray-500 border-[1px] lg:border-0 border-slate-700 text-black rounded text-base lg:text-xl font-semibold ${pause ? '' : 'active:bg-slate-400 hover:bg-slate-400 dark:active:bg-[#101929] dark:hover:bg-[#101929] duration-200 dark:active:text-white dark:hover:text-white transition'}`}
                   onClick={() => {
                     if (pause || selectedCell === null) return
 
@@ -955,7 +955,7 @@ const Game = ({ puzzle, sol }) => {
                 </button>
               ))}
               <button
-                className={`w-full p-1 sm:py-3 bg-slate-300 dark:bg-[#020817] sm:dark:bg-[#152237] dark:text-gray-200 sm:dark:text-gray-500 border-[1px] sm:border-0 border-slate-700 text-black rounded text-sm sm:text-xl font-semibold ${pause ? '' : 'hover:bg-slate-400 dark:hover:bg-[#101929] duration-200 dark:hover:text-white transition'} hidden sm:flex items-center justify-center`}
+                className={`w-full p-1 lg:py-3 bg-slate-300 dark:bg-[#020817] lg:dark:bg-[#152237] dark:text-gray-200 lg:dark:text-gray-500 border-[1px] lg:border-0 border-slate-700 text-black rounded text-sm lg:text-xl font-semibold ${pause ? '' : 'hover:bg-slate-400 dark:hover:bg-[#101929] duration-200 dark:hover:text-white transition'} hidden lg:flex items-center justify-center`}
                 onClick={() => {
                   if (pause || selectedCell === null) return
 
@@ -978,7 +978,7 @@ const Game = ({ puzzle, sol }) => {
           </div>
         </div>
 
-        <div className='hidden sm:flex items-center justify-center w-full gap-32 mt-5'>
+        <div className='hidden lg:flex items-center justify-center w-full gap-32 mt-5'>
           <button
             onClick={() => {
               if (undoStack.length === 0) return

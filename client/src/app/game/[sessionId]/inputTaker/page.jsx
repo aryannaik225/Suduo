@@ -3,6 +3,7 @@
 import { useParams, useRouter } from "next/navigation"
 import { useEffect, useState } from "react"
 import { FaSpinner } from "react-icons/fa"
+import { LuCircleDashed } from "react-icons/lu";
 import { ToastContainer, toast } from "react-toastify"
 import 'react-toastify/dist/ReactToastify.css'
 import { nanoid } from "nanoid"
@@ -145,18 +146,18 @@ export default function Home() {
 
 
   return (
-    <div className="relative w-screen h-screen flex justify-center items-center bg-gradient-to-br from-white via-gray-100 to-white dark:from-[#0f172a] dark:via-[#0a0f1f] dark:to-[#0f172a] overflow-hidden">
+    <div className="relative w-screen h-screen flex justify-center items-center bg-gradient-to-br from-white via-gray-100 to-white dark:from-[#0f172a] dark:via-[#0a0f1f] dark:to-[#0f172a] overflow-hidden px-4 sm:px-6 lg:px-8">
       <ToastContainer />
 
       {/* Glowing blobs in the background */}
       <div className="absolute w-full h-full pointer-events-none z-0">
-        <div className="absolute top-1/4 left-1/4 w-40 h-40 bg-cyan-400 opacity-20 blur-3xl rounded-full animate-pulse dark:opacity-10"></div>
-        <div className="absolute top-[60%] right-[20%] w-52 h-52 bg-purple-500 opacity-20 blur-2xl rounded-full animate-ping dark:opacity-10"></div>
+        <div className="absolute top-1/4 left-1/4 w-32 h-32 sm:w-40 sm:h-40 bg-cyan-400 opacity-20 blur-3xl rounded-full animate-pulse dark:opacity-10"></div>
+        <div className="absolute top-[60%] right-[20%] w-40 h-40 sm:w-52 sm:h-52 bg-purple-500 opacity-20 blur-2xl rounded-full animate-ping dark:opacity-10"></div>
       </div>
 
       {/* Centered container with glassmorphism and glowing box shadow */}
-      <div className="relative z-10 flex flex-col items-center min-h-10 w-80 backdrop-blur-md bg-white/80 dark:bg-white/5 border border-gray-200 dark:border-white/10 p-8 rounded-2xl shadow-[0_0_30px_rgba(0,0,0,0.05)] dark:shadow-[0_0_30px_rgba(0,255,255,0.1)]">
-        <div className="text-2xl font-semibold text-gray-800 dark:text-white mb-8 text-center" onClick={() => setTheme(prev => prev === 'dark' ? 'light' : 'dark')}>
+      <div className="relative z-10 flex flex-col items-center w-full max-w-sm sm:max-w-md md:max-w-lg backdrop-blur-md bg-white/80 dark:bg-white/5 border border-gray-200 dark:border-white/10 p-6 sm:p-8 rounded-2xl shadow-[0_0_30px_rgba(0,0,0,0.05)] dark:shadow-[0_0_30px_rgba(0,255,255,0.1)]">
+        <div className="text-xl sm:text-2xl lg:text-3xl font-semibold text-gray-800 dark:text-white mb-6 sm:mb-8 text-center" onClick={() => setTheme(prev => prev === 'dark' ? 'light' : 'dark')}>
           Enter Your Username
         </div>
 
@@ -178,7 +179,7 @@ export default function Home() {
           {loading
             ? ready
               ? <><SiTicktick className='mr-2' />Game Ready</>
-              : <><FaSpinner className='animate-spin mr-2' /> Creating Game</>
+              : <><LuCircleDashed className='animate-spin mr-2' /> Creating Game</>
             : 'Start Game'
           }
         </button>
