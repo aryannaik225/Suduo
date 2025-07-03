@@ -4,6 +4,20 @@ Suduo is a **real-time, multiplayer, live-synced Sudoku game**. Challenge your f
 
 🌐 Live at: [https://suduo.vercel.app](https://suduo.vercel.app)
 
+<p align='center'>
+ <img src='client/public/screenshot1.png' width='800px'/>
+</p>
+
+<p align='center'>
+ <img src='client/public/screenshot2.png' width='800px'/>
+</p>
+ 
+<div align="center" width="100%">
+  <a href="https://suduo.vercel.app" target="_blank">
+    <img src="https://github.com/aryannaik225/React-Portfolio/blob/main/assets/view-button.svg" alt="Visit Site">  
+  </a>
+</div>
+
 ---
 
 ## 🎮 Features
